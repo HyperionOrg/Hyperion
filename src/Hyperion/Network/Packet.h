@@ -15,16 +15,17 @@ namespace Hyperion
 		std::vector<uint8_t> m_Data;
 
 	public:
-		Packet(VarInt id = -1)
+		Packet(VarInt id = 0)
 			: m_Id(id), m_Length(sizeof(m_Id)), m_Data({}) {}
 
-		virtual void Serialize() = 0;
-		virtual void Deserialize() = 0;
+		virtual void Serialize() {}
+		virtual void Deserialize() {}
 
 		void CalculateLength() { m_Length = static_cast<VarInt>(sizeof(m_Id) + sizeof(uint8_t) * m_Data.size()); }
 
 		VarInt GetId() const { return m_Id; }
 		VarInt GetLength() const { return m_Length; }
+		std::vector<uint8_t>& GetData() { return m_Data; }
 		const std::vector<uint8_t>& GetData() const { return m_Data; }
 	};
 
