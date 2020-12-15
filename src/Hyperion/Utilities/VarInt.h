@@ -1,18 +1,17 @@
 #pragma once
 
-#include <cstdint>
+#include <vector>
 
 class VarInt
 {
 private:
-	int32_t m_Value;
+	std::vector<uint8_t> m_Data;
 
 public:
 	VarInt(int32_t value = 0);
 
-	static int32_t Decode(int32_t value);
-	static int32_t Decode(uint8_t* value);
-	static int32_t Decode(VarInt varInt);
+	const std::vector<uint8_t>& GetData() const { return m_Data; }
 
-	operator int32_t() { return m_Value; }
+	static int32_t Decode(const std::vector<uint8_t>& values);
+	static int32_t Decode(const VarInt& varInt);
 };

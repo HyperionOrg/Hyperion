@@ -1,16 +1,17 @@
 #pragma once
 
-#include <cstdint>
+#include <vector>
 
 class VarLong
 {
 private:
-	int64_t m_Value;
+	std::vector<uint8_t> m_Data;
 
 public:
 	VarLong(int64_t value);
 
-	static int64_t Decode(VarLong varInt);
+	const std::vector<uint8_t>& GetData() const { return m_Data; }
 
-	operator int64_t() { return m_Value; }
+	static int64_t Decode(const std::vector<uint8_t>& values);
+	static int64_t Decode(const VarLong& varLong);
 };
