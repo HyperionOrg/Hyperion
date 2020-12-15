@@ -2,6 +2,8 @@
 
 #include <iostream>
 
+#include "Handshaking/Handshake.h"
+
 namespace Hyperion
 {
 	HyperionServer::HyperionServer()
@@ -51,17 +53,9 @@ namespace Hyperion
 	{
 		Start();
 
-		std::string line;
 		while (m_Running)
 		{
-			while (std::getline(std::cin, line))
-			{
-				if (line.empty() || line == "")
-					break;
-
-				HP_WARN("The Command '{0}' was not found!", line);
-			}
-			}
+			Update();
 		}
 	}
 
@@ -101,16 +95,18 @@ namespace Hyperion
 
 	bool HyperionServer::OnClientConnect(Ref<Connection> client)
 	{
+		HP_INFO("Client Connected");
 		return true;
 	}
 
 	void HyperionServer::OnClientDisconnect(Ref<Connection> client)
 	{
-
+		HP_INFO("Client Disconnected");
 	}
 
 	void HyperionServer::OnPacket(Ref<Connection> client, const Ref<Packet>& packet)
 	{
+		HP_INFO("Packet");
 
 	}
 
