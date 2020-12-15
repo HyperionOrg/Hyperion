@@ -12,7 +12,7 @@ namespace Hyperion
 	{
 	}
 
-	void Connection::ConnectToClient(uint32_t id)
+	void Connection::ConnectToClient(size_t id)
 	{
 		if (IsConnected())
 		{

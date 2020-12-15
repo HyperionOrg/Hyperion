@@ -1,13 +1,15 @@
 #pragma once
 
 #ifdef _WIN32
+#ifndef _WIN32_WINNT
 #define _WIN32_WINNT 0x0601
+#endif
 #endif
 
 #include <asio.hpp>
 
 #include "Core.h"
-#include "Packet.h"
+#include "Packets/Packet.h"
 #include "Utilities/ThreadSafeQueue.h"
 
 namespace Hyperion
@@ -18,7 +20,7 @@ namespace Hyperion
 		asio::io_context& m_Context;
 		asio::ip::tcp::socket m_Socket;
 
-		uint32_t m_Id;
+		size_t m_Id;
 
 		ThreadSafeQueue<Ref<Packet>> m_PacketsOut;
 		ThreadSafeQueue<OwnedPacket>& m_PacketsIn;
@@ -29,14 +31,14 @@ namespace Hyperion
 		Connection(asio::io_context& context, asio::ip::tcp::socket socket, ThreadSafeQueue<OwnedPacket>& packetsIn);
 		~Connection();
 		
-		void ConnectToClient(uint32_t id = 0);
+		void ConnectToClient(size_t id = 0);
 		void Disconnect();
 
 		void SendPacket(const Ref<Packet>& packet);
 	
 		bool IsConnected() const;
 
-		uint32_t GetId() const { return m_Id; }
+		size_t GetId() const { return m_Id; }
 
 	private:
 		void WriteBody();
