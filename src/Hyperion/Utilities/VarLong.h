@@ -8,6 +8,7 @@ private:
 	std::vector<uint8_t> m_Data;
 
 public:
+	VarLong() = default;
 	VarLong(uint8_t firstByte = 0);
 	VarLong(int64_t value);
 

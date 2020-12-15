@@ -8,6 +8,7 @@ private:
 	std::vector<uint8_t> m_Data;
 
 public:
+	VarInt() = default;
 	VarInt(uint8_t firstByte = 0);
 	VarInt(int32_t value = 0);
 
