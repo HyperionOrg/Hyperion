@@ -22,4 +22,8 @@ constexpr Ref<T> CreateRef(Args&& ... args)
 
 #include "Utilities/Log.h"
 
+#ifdef _DEBUG
 #define HP_ASSERT(x, ...) { if(!(x)) { HP_FATAL("Assertion Failed: {0}", __VA_ARGS__); __debugbreak(); } }
+#else
+#define HP_ASSERT(x, ...)
+#endif
