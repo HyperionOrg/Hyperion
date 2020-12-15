@@ -22,4 +22,4 @@ constexpr Ref<T> CreateRef(Args&& ... args)
 
 #include "Utilities/Log.h"
 
-#define HP_ASSERT(x, ...) { if(!(x)) { HP_FATAL("Assertion Failed: %", __VA_ARGS__); __debugbreak(); } }
+#define HP_ASSERT(x, ...) { if(!(x)) { HP_FATAL("Assertion Failed: {0}", __VA_ARGS__); __debugbreak(); } }

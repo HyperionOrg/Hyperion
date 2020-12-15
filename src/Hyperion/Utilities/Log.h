@@ -31,4 +31,4 @@ namespace Hyperion
 #define HP_WARN(...)    ::Hyperion::Log::GetLogger()->warn(__VA_ARGS__)
 #define HP_ERROR(...)   ::Hyperion::Log::GetLogger()->error(__VA_ARGS__)
 #define HP_FATAL(...)   ::Hyperion::Log::GetLogger()->critical(__VA_ARGS__)
-#define HP_DEBUG(...)   ::Hyperion::Log::GetLogger()->debug(__VA_ARGS__))
+#define HP_DEBUG(...)   ::Hyperion::Log::GetLogger()->debug(__VA_ARGS__)
