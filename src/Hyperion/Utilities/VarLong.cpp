@@ -2,6 +2,11 @@
 
 #include "Core.h"
 
+VarLong::VarLong(uint8_t firstByte)
+{
+	m_Data.push_back(firstByte);
+}
+
 VarLong::VarLong(int64_t value)
 {
 	do

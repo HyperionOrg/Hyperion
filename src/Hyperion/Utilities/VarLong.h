@@ -8,6 +8,7 @@ private:
 	std::vector<uint8_t> m_Data;
 
 public:
+	VarLong(uint8_t firstByte = 0);
 	VarLong(int64_t value);
 
 	const std::vector<uint8_t>& GetData() const { return m_Data; }

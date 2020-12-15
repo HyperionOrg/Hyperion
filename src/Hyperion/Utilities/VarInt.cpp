@@ -2,6 +2,11 @@
 
 #include "Core.h"
 
+VarInt::VarInt(uint8_t firstByte)
+{
+	m_Data.push_back(firstByte);
+}
+
 VarInt::VarInt(int32_t value)
 {
 	do
