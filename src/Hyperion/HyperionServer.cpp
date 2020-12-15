@@ -2,8 +2,6 @@
 
 #include <iostream>
 
-#include "Handshaking/Handshake.h"
-
 namespace Hyperion
 {
 	HyperionServer::HyperionServer()
