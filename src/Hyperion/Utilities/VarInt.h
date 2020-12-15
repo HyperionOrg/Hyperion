@@ -9,8 +9,8 @@ private:
 
 public:
 	VarInt() = default;
-	VarInt(uint8_t firstByte = 0);
-	VarInt(int32_t value = 0);
+	VarInt(uint8_t firstByte);
+	VarInt(int32_t value);
 
 	const std::vector<uint8_t>& GetData() const { return m_Data; }
 
