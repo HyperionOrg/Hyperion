@@ -19,6 +19,8 @@ namespace Hyperion
 	void HyperionServer::Init()
 	{
 		Log::Init();
+
+		m_PacketManager = CreateScope<PacketManager>();
 	}
 
 	void HyperionServer::Start()
@@ -104,8 +106,7 @@ namespace Hyperion
 
 	void HyperionServer::OnPacket(Ref<Connection> client, const Ref<Packet>& packet)
 	{
-		HP_INFO("Packet");
-
+		m_PacketManager->ProcessPacket(client, packet);
 	}
 
 	void HyperionServer::SendPacketToAllClients(const Ref<Packet>& packet)

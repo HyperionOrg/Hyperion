@@ -12,7 +12,7 @@
 
 #include "Core.h"
 #include "Network/Connection.h"
-#include "Network/Packet.h"
+#include "Packets/PacketManager.hpp"
 #include "Utilities/ThreadSafeQueue.h"
 
 namespace Hyperion
@@ -22,6 +22,8 @@ namespace Hyperion
 	private:
 		/* Data */
 		uint16_t m_Port;
+
+		Scope<PacketManager> m_PacketManager;
 
 		bool m_Running = true;
 
