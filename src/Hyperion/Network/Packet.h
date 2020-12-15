@@ -16,17 +16,30 @@ namespace Hyperion
 
 	public:
 		Packet(VarInt id = 0)
-			: m_Id(id), m_Length(sizeof(m_Id)), m_Data({}) {}
+			: m_Id(id), m_Length(0), m_Data({}) {}
 
-		virtual void Serialize() {}
-		virtual void Deserialize() {}
+		void Encode()
+		{
+			Serialize();
+		}
 
-		void CalculateLength() { m_Length = static_cast<VarInt>(sizeof(m_Id) + sizeof(uint8_t) * m_Data.size()); }
+		void Decode()
+		{
+			m_Length = VarInt(m_Data[0]);
+			m_Id = VarInt(m_Data[1]);
+			m_Data.erase(m_Data.begin(), m_Data.begin() + 2);
+			Deserialize();
+		}
 
 		VarInt GetId() const { return m_Id; }
 		VarInt GetLength() const { return m_Length; }
+
 		std::vector<uint8_t>& GetData() { return m_Data; }
 		const std::vector<uint8_t>& GetData() const { return m_Data; }
+
+	protected:
+		virtual void Serialize() {}
+		virtual void Deserialize() {}
 	};
 
 	class Connection;
