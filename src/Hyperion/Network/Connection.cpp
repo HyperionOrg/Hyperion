@@ -83,7 +83,7 @@ namespace Hyperion
 	void Connection::ReadBody()
 	{
 		m_TempPacket->GetData().resize(1);
-		asio::async_read(m_Socket, asio::buffer(m_TempPacket->GetData()), [this](std::error_code sizeError, size_t sizeSize)
+		asio::async_read(m_Socket, asio::buffer(m_TempPacket->GetData()), [this](std::error_code sizeError, size_t sizeReadSize)
 			{
 				if (sizeError)
 				{
@@ -93,22 +93,27 @@ namespace Hyperion
 				}
 				else
 				{
+					int32_t dataSize = VarInt::Decode(m_TempPacket->GetData()[0]);
 					HP_INFO("Read Size successfully!");
-					HP_DEBUG("Size: {0}", VarInt::Decode(m_TempPacket->GetData()[0]));
-					m_TempPacket->GetData().resize(VarInt::Decode(m_TempPacket->GetData()[0]));
+					m_TempPacket->GetData().resize(dataSize);
 
-					asio::async_read(m_Socket, asio::buffer(m_TempPacket->GetData()), [this](std::error_code bodyError, size_t dataSize)
+					asio::async_read(m_Socket, asio::buffer(m_TempPacket->GetData()), [this, dataSize](std::error_code bodyError, size_t dataReadSize)
 						{
-							if (bodyError && bodyError != asio::error::eof)
+							if (bodyError)
 							{
 								HP_ERROR("Body reading error: {0}", bodyError.message());
-								HP_ASSERT(false, "Read Body failed!", m_Id);
+								HP_ASSERT(bodyError == asio::error::eof, "Read Body failed!", m_Id);
 								m_Socket.close();
 							}
 							else
 							{
 								HP_INFO("Read Body successfully!");
-								m_TempPacket->GetData().resize(dataSize);
+								m_TempPacket->GetData().resize(dataReadSize + 1);
+								m_TempPacket->GetData().insert(m_TempPacket->GetData().begin(), dataSize);
+								m_TempPacket->GetData().resize(dataReadSize + 1);
+
+								m_TempPacket->Decode();
+
 								m_PacketsIn.push_back({ this->shared_from_this(), m_TempPacket });
 							}
 						});
