@@ -1,4 +1,6 @@
-#include "PacketManager.hpp"
+#include "PacketManager.h"
+
+#include "Objects/ServerListPing.h"
 
 #include "PacketsIn/PacketInHandshake.h"
 #include "PacketsIn/PacketInPing.h"
@@ -48,9 +50,19 @@ namespace Hyperion
 		switch (m_LastPacketId)
 		{
 		case Hyperion::PacketInIds::HANDSHAKE:
-
 		{
-			Ref<PacketOutResponse> responsePacket = CreateRef<PacketOutResponse>("{\"version\":{\"name\":\"1.16.4\",\"protocol\":754},\"players\":{\"max\":100,\"online\":5,\"sample\":[{\"name\":\"thinkofdeath\",\"id\":\"4566e69f-c907-48ee-8d71-d7ba5aa00d20\"}]},\"description\":{\"text\":\"Hello World\",\"color\":\"yellow\"}}");
+			ServerListPingInfo serverListPing{};
+			serverListPing.Version.Name = "1.16.4";
+			serverListPing.Version.ProtocolVersion = 754;
+			serverListPing.Players.Max = 1000;
+			serverListPing.Players.Online = 0;
+			serverListPing.Players.Sample = { { "Test User", "e9013c2f-da01-425f-a48b-516f55e94386" } };
+
+			nlohmann::json serverListPingJson = serverListPing;
+
+			HP_DEBUG("{0}", serverListPingJson.dump(4));
+
+			Ref<PacketOutResponse> responsePacket = CreateRef<PacketOutResponse>(serverListPingJson.dump());
 			SendPacketToClient(client, responsePacket); // Response Packet
 			ReadPacketFromClient(client); // Ping Packet
 			break;

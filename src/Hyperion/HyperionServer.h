@@ -12,7 +12,7 @@
 
 #include "Core.h"
 #include "Network/Connection.h"
-#include "Packets/PacketManager.hpp"
+#include "Packets/PacketManager.h"
 #include "Utilities/ThreadSafeQueue.h"
 
 namespace Hyperion
