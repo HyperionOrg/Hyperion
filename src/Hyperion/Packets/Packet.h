@@ -15,9 +15,21 @@ namespace Hyperion
 		std::vector<uint8_t> m_Data;
 
 	public:
-		Packet(VarInt id = 0)
-			: m_Id(id), m_Length(0), m_Data({}) {}
+		Packet()
+			: m_Id(0), m_Length(0), m_Data({}) {}
 
+		Packet(const Ref<Packet> packet)
+			: m_Id(packet->GetId()), m_Length(packet->GetLength()), m_Data(packet->GetData())
+		{
+		}
+
+		VarInt GetId() const { return m_Id; }
+		VarInt GetLength() const { return m_Length; }
+
+		std::vector<uint8_t>& GetData() { return m_Data; }
+		const std::vector<uint8_t>& GetData() const { return m_Data; }
+
+	protected:
 		void Encode()
 		{
 			Serialize();
@@ -31,13 +43,6 @@ namespace Hyperion
 			Deserialize();
 		}
 
-		VarInt GetId() const { return m_Id; }
-		VarInt GetLength() const { return m_Length; }
-
-		std::vector<uint8_t>& GetData() { return m_Data; }
-		const std::vector<uint8_t>& GetData() const { return m_Data; }
-
-	protected:
 		virtual void Serialize() {}
 		virtual void Deserialize() {}
 	};
