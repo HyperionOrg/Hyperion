@@ -25,7 +25,7 @@ namespace Hyperion
 			case Hyperion::PacketInIds::HANDSHAKE:
 			{
 				Ref<PacketInHandshake> handshakePacket = CreateRef<PacketInHandshake>(packet);
-				ReadPacketFromClient(client); // Request Packet
+				//ReadPacketFromClient(client); // Request Packet
 				break;
 			}
 			case Hyperion::PacketInIds::PING:
@@ -60,7 +60,6 @@ namespace Hyperion
 
 			Ref<PacketOutResponse> responsePacket = CreateRef<PacketOutResponse>(static_cast<nlohmann::json>(serverListPing).dump());
 			SendPacketToClient(client, responsePacket); // Response Packet
-			ReadPacketFromClient(client); // Ping Packet
 			break;
 		}
 		case Hyperion::PacketInIds::PING:
@@ -119,65 +118,6 @@ namespace Hyperion
 			if (client && client->IsConnected())
 			{
 				client->SendPacket(packet);
-				KillInvalidClient(client);
-			}
-			else
-			{
-				m_DisconnectFunction(client);
-				client.reset();
-				invalidClient = true;
-			}
-		}
-
-		if (invalidClient)
-			m_Connections.erase(std::remove(m_Connections.begin(), m_Connections.end(), nullptr), m_Connections.end());
-	}
-
-	void PacketManager::ReadPacketFromAllClients()
-	{
-		bool invalidClient = false;
-		for (auto& client : m_Connections)
-		{
-			if (client && client->IsConnected())
-			{
-				client->ReadPacket();
-				KillInvalidClient(client);
-			}
-			else
-			{
-				m_DisconnectFunction(client);
-				client.reset();
-				invalidClient = true;
-			}
-		}
-
-		if (invalidClient)
-			m_Connections.erase(std::remove(m_Connections.begin(), m_Connections.end(), nullptr), m_Connections.end());
-	}
-
-	void PacketManager::ReadPacketFromClient(Ref<Connection> client)
-	{
-		if (client && client->IsConnected())
-		{
-			client->ReadPacket();
-			KillInvalidClient(client);
-		}
-		else
-		{
-			m_DisconnectFunction(client);
-			client.reset();
-			m_Connections.erase(std::remove(m_Connections.begin(), m_Connections.end(), client), m_Connections.end());
-		}
-	}
-
-	void PacketManager::ReadPacketFromClients(std::vector<Ref<Connection>>& clients)
-	{
-		bool invalidClient = false;
-		for (auto& client : clients)
-		{
-			if (client && client->IsConnected())
-			{
-				client->ReadPacket();
 				KillInvalidClient(client);
 			}
 			else

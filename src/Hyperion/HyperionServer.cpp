@@ -61,6 +61,13 @@ namespace Hyperion
 
 	void HyperionServer::Update()
 	{
+		for (auto& connection : m_Connections)
+		{
+			if (connection && connection->IsConnected())
+				connection->ReadPackets();
+			m_PacketManager->KillInvalidClient(connection);
+		}
+
 		while (!m_PacketsQueue.empty())
 		{
 			auto packet = m_PacketsQueue.pop_front();
@@ -71,25 +78,31 @@ namespace Hyperion
 
 	void HyperionServer::WaitForClients()
 	{
-		m_Acceptor.async_accept([this](std::error_code errorCode, asio::ip::tcp::socket socket)
+		m_Acceptor.async_accept([this](std::error_code connectionError, asio::ip::tcp::socket socket)
 			{
-				HP_ASSERT(!errorCode, "Connection Error: {0}", errorCode.message());
-
-				HP_INFO("New Connection: {0}", socket.remote_endpoint().address().to_string());
-				Ref<Connection> connection = CreateRef<Connection>(m_Context, std::move(socket), m_PacketsQueue);
-
-				if (OnClientConnect(connection))
+				if (connectionError)
 				{
-					m_Connections.push_back(std::move(connection));
-					m_Connections.back()->ConnectToClient(m_ConnectionCounter++);
-					HP_INFO("Connection {0} Approved! (Current alive Connections: {1})", m_Connections.back()->GetId(), m_Connections.size());
+					HP_ERROR("Connection Error: {0}", connectionError.message());
+					HP_ASSERT(false, "Connecting failed!");
 				}
 				else
 				{
-					HP_INFO("Connection Denied!");
-				}
+					HP_INFO("New Connection: {0}", socket.remote_endpoint().address().to_string());
+					Ref<Connection> connection = CreateRef<Connection>(m_Context, std::move(socket), m_PacketsQueue);
 
-				WaitForClients();
+					if (OnClientConnect(connection))
+					{
+						m_Connections.push_back(std::move(connection));
+						m_Connections.back()->ConnectToClient(m_ConnectionCounter++);
+						HP_INFO("Connection {0} Approved! (Current alive Connections: {1})", m_Connections.back()->GetId(), m_Connections.size());
+					}
+					else
+					{
+						HP_INFO("Connection Denied!");
+					}
+
+					WaitForClients();
+				}
 			});
 	}
 

@@ -21,6 +21,7 @@ namespace Hyperion
 		asio::ip::tcp::socket m_Socket;
 
 		size_t m_Id;
+		bool m_Reading = false;
 
 		ThreadSafeQueue<Ref<Packet>> m_PacketsOut;
 		ThreadSafeQueue<OwnedPacket>& m_PacketsIn;
@@ -35,14 +36,14 @@ namespace Hyperion
 		void Disconnect();
 
 		void SendPacket(const Ref<Packet>& packet);
+		void ReadPackets();
 	
 		bool IsConnected() const;
 
 		size_t GetId() const { return m_Id; }
 
-		void ReadPacket();
-
 	private:
-		void WriteBody();
+		void WritePacket();
+		void ReadPacket();
 	};
 }
