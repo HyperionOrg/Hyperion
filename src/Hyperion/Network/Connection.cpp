@@ -65,21 +65,6 @@ namespace Hyperion
 			});
 	}
 
-	void WriteVarInt(uint32_t i)
-	{
-		while (true)
-		{
-			if ((i & 0xFFFFFF80) == 0)
-			{
-				HP_WARN("{0}", i & 0x7F | 0x80);
-				break;
-			}
-
-			HP_WARN("{0}", i & 0x7F | 0x80);
-			i = i >> 7;
-		}
-	}
-
 	void Connection::ReadBody()
 	{
 		m_TempPacket->GetData().resize(1);
@@ -111,8 +96,6 @@ namespace Hyperion
 								m_TempPacket->GetData().resize(dataReadSize + 1);
 								m_TempPacket->GetData().insert(m_TempPacket->GetData().begin(), dataSize);
 								m_TempPacket->GetData().resize(dataReadSize + 1);
-
-								m_TempPacket->Decode();
 
 								m_PacketsIn.push_back({ this->shared_from_this(), m_TempPacket });
 							}
