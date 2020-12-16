@@ -54,6 +54,5 @@ namespace Hyperion
 
 		bool OnClientConnect(Ref<Connection> client);
 		void OnClientDisconnect(Ref<Connection> client);
-		void OnPacket(Ref<Connection> client, const Ref<Packet>& packet);
 	};
 }
