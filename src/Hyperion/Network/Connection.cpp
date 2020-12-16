@@ -56,7 +56,6 @@ namespace Hyperion
 				}
 				else
 				{
-					HP_INFO("Write Body successfully!");
 					m_PacketsOut.pop_front();
 
 					if (!m_PacketsOut.empty())
@@ -80,7 +79,6 @@ namespace Hyperion
 					else
 					{
 						int32_t dataSize = VarInt::Decode(m_TempPacket->GetData()[0]);
-						HP_INFO("Read Size successfully!");
 						m_TempPacket->GetData().resize(dataSize);
 
 						asio::async_read(m_Socket, asio::buffer(m_TempPacket->GetData()), [this, dataSize](std::error_code bodyError, size_t dataReadSize)
@@ -93,7 +91,6 @@ namespace Hyperion
 								}
 								else
 								{
-									HP_INFO("Read Body successfully!");
 									m_TempPacket->GetData().resize(dataReadSize);
 
 									m_TempPacket->m_Length = dataSize;

@@ -13,8 +13,6 @@ namespace Hyperion
 		m_Data.push_back(VarInt(0x00).GetData()[0]);
 
 		VarInt lengthVarInt(static_cast<int32_t>(m_Response.size()));
-		HP_DEBUG("{0}, {1}, {2}", m_Response.size(), lengthVarInt.GetData()[0], lengthVarInt.GetData()[1]);
-		HP_DEBUG("{0}", VarInt::Decode({ lengthVarInt.GetData()[0], lengthVarInt.GetData()[1] }));
 		for (size_t i = 0; i < lengthVarInt.GetData().size(); i++)
 			m_Data.push_back(lengthVarInt.GetData()[i]);
 

@@ -82,7 +82,7 @@ namespace Hyperion
 				{
 					m_Connections.push_back(std::move(connection));
 					m_Connections.back()->ConnectToClient(m_ConnectionCounter++);
-					HP_INFO("Connection {0} Approved!", m_Connections.back()->GetId());
+					HP_INFO("Connection {0} Approved! (Current alive Connections: {1})", m_Connections.back()->GetId(), m_Connections.size());
 				}
 				else
 				{

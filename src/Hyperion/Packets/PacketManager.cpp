@@ -17,23 +17,15 @@ namespace Hyperion
 			{
 			case Hyperion::PacketInIds::HANDSHAKE:
 			{
-				HP_DEBUG("HANDSHAKE");
 				Ref<PacketInHandshake> handshakePacket = CreateRef<PacketInHandshake>(packet);
-
-				HP_DEBUG("{0}, {1}, {2}, {3}", VarInt::Decode(handshakePacket->GetProtocolVersion()), handshakePacket->GetServerAddress(), handshakePacket->GetServerPort(), handshakePacket->GetState());
-
-				client->ReadPacket();
+				client->ReadPacket(); // Request Packet
 				break;
 			}
 			case Hyperion::PacketInIds::PING:
 			{
-				HP_DEBUG("PING");
 				Ref<PacketInPing> pingPacket = CreateRef<PacketInPing>(packet);
-
 				Ref<PacketOutPong> pongPacket = CreateRef<PacketOutPong>(pingPacket->GetPayload());
-
-				client->SendPacket(pongPacket);
-
+				client->SendPacket(pongPacket); // Pong Packet
 				break;
 			}
 			default:
@@ -50,12 +42,11 @@ namespace Hyperion
 
 		switch (m_LastPacketId)
 		{
-		case Hyperion
-		::PacketInIds::HANDSHAKE:
+		case Hyperion::PacketInIds::HANDSHAKE:
 		
 		{
 			Ref<PacketOutResponse> responsePacket = CreateRef<PacketOutResponse>("{\"version\":{\"name\":\"1.16.4\",\"protocol\":754},\"players\":{\"max\":100,\"online\":5,\"sample\":[{\"name\":\"thinkofdeath\",\"id\":\"4566e69f-c907-48ee-8d71-d7ba5aa00d20\"}]},\"description\":{\"text\":\"Hello World\",\"color\":\"yellow\"}}");
-			client->SendPacket(responsePacket);
+			client->SendPacket(responsePacket); // Response Packet
 			break;
 		}
 		case Hyperion::PacketInIds::PING:
