@@ -20,7 +20,7 @@ namespace Hyperion
 	{
 		Log::Init();
 
-		m_PacketManager = CreateScope<PacketManager>();
+		m_PacketManager = CreateScope<PacketManager>(m_Connections, std::bind(&HyperionServer::OnClientDisconnect, this, std::placeholders::_1));
 	}
 
 	void HyperionServer::Start()
@@ -65,7 +65,7 @@ namespace Hyperion
 		{
 			auto packet = m_PacketsQueue.pop_front();
 
-			OnPacket(packet.Remote, packet.Packet);
+			m_PacketManager->ProcessPacket(packet.Remote, packet.Packet);
 		}
 	}
 
@@ -102,50 +102,5 @@ namespace Hyperion
 	void HyperionServer::OnClientDisconnect(Ref<Connection> client)
 	{
 		HP_INFO("Client Disconnected");
-	}
-
-	void HyperionServer::OnPacket(Ref<Connection> client, const Ref<Packet>& packet)
-	{
-		m_PacketManager->ProcessPacket(client, packet);
-	}
-
-	void HyperionServer::SendPacketToAllClients(const Ref<Packet>& packet)
-	{
-		bool invalidClient = false;
-		for (auto& client : m_Connections)
-		{
-			if (client && client->IsConnected())
-			{
-				client->SendPacket(packet);
-			}
-			else
-			{
-				OnClientDisconnect(client);
-				client.reset();
-				invalidClient = true;
-			}
-		}
-
-		if (invalidClient)
-			m_Connections.erase(std::remove(m_Connections.begin(), m_Connections.end(), nullptr), m_Connections.end());
-	}
-
-	void HyperionServer::SendPacketToClient(Ref<Connection> client, const Ref<Packet>& packet)
-	{
-		if (client && client->IsConnected())
-		{
-			client->SendPacket(packet);
-		}
-		else
-		{
-			OnClientDisconnect(client);
-			client.reset();
-			m_Connections.erase(std::remove(m_Connections.begin(), m_Connections.end(), client), m_Connections.end());
-		}
-	}
-
-	void HyperionServer::SendPacketToClients(std::vector<Ref<Connection>>& clients, const Ref<Packet>& packet)
-	{
-
 	}
 }

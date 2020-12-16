@@ -8,6 +8,11 @@
 
 namespace Hyperion
 {
+	PacketManager::PacketManager(std::deque<Ref<Connection>>& connections, std::function<void(Ref<Connection>)> disconnectFunction)
+		: m_Connections(connections), m_DisconnectFunction(disconnectFunction)
+	{
+	}
+
 	void PacketManager::ProcessPacket(Ref<Connection> client, const Ref<Packet>& packet)
 	{
 		if (!ProcessRequest(client, packet))
@@ -25,7 +30,7 @@ namespace Hyperion
 			{
 				Ref<PacketInPing> pingPacket = CreateRef<PacketInPing>(packet);
 				Ref<PacketOutPong> pongPacket = CreateRef<PacketOutPong>(pingPacket->GetPayload());
-				client->SendPacket(pongPacket); // Pong Packet
+				SendPacketToClient(client, pongPacket); // Pong Packet
 				break;
 			}
 			default:
@@ -46,7 +51,7 @@ namespace Hyperion
 		
 		{
 			Ref<PacketOutResponse> responsePacket = CreateRef<PacketOutResponse>("{\"version\":{\"name\":\"1.16.4\",\"protocol\":754},\"players\":{\"max\":100,\"online\":5,\"sample\":[{\"name\":\"thinkofdeath\",\"id\":\"4566e69f-c907-48ee-8d71-d7ba5aa00d20\"}]},\"description\":{\"text\":\"Hello World\",\"color\":\"yellow\"}}");
-			client->SendPacket(responsePacket); // Response Packet
+			SendPacketToClient(client, responsePacket); // Response Packet
 			client->ReadPacket(); // Ping Packet
 			break;
 		}
@@ -59,5 +64,61 @@ namespace Hyperion
 			break;
 		}
 		return true;
+	}
+
+	void PacketManager::SendPacketToAllClients(const Ref<Packet>& packet)
+	{
+		bool invalidClient = false;
+		for (auto& client : m_Connections)
+		{
+			if (client && client->IsConnected())
+			{
+				client->SendPacket(packet);
+			}
+			else
+			{
+				m_DisconnectFunction(client);
+				client.reset();
+				invalidClient = true;
+			}
+		}
+
+		if (invalidClient)
+			m_Connections.erase(std::remove(m_Connections.begin(), m_Connections.end(), nullptr), m_Connections.end());
+	}
+
+	void PacketManager::SendPacketToClient(Ref<Connection> client, const Ref<Packet>& packet)
+	{
+		if (client && client->IsConnected())
+		{
+			client->SendPacket(packet);
+		}
+		else
+		{
+			m_DisconnectFunction(client);
+			client.reset();
+			m_Connections.erase(std::remove(m_Connections.begin(), m_Connections.end(), client), m_Connections.end());
+		}
+	}
+
+	void PacketManager::SendPacketToClients(std::vector<Ref<Connection>>& clients, const Ref<Packet>& packet)
+	{
+		bool invalidClient = false;
+		for (auto& client : clients)
+		{
+			if (client && client->IsConnected())
+			{
+				client->SendPacket(packet);
+			}
+			else
+			{
+				m_DisconnectFunction(client);
+				client.reset();
+				invalidClient = true;
+			}
+		}
+
+		if (invalidClient)
+			m_Connections.erase(std::remove(m_Connections.begin(), m_Connections.end(), nullptr), m_Connections.end());
 	}
 }

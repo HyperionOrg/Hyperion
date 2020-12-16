@@ -1,5 +1,8 @@
 #pragma once
 
+#include <functional>
+#include <queue>
+
 #include "Core.h"
 #include "Packet.h"
 #include "Network/Connection.h"
@@ -24,8 +27,17 @@ namespace Hyperion
 	private:
 		PacketInIds m_LastPacketId;
 
+		std::deque<Ref<Connection>>& m_Connections;
+		std::function<void(Ref<Connection>)> m_DisconnectFunction;
+
 	public:
+		PacketManager(std::deque<Ref<Connection>>& connections, std::function<void(Ref<Connection>)> disconnectFunction);
+
 		void ProcessPacket(Ref<Connection> client, const Ref<Packet>& packet);
+
+		void SendPacketToAllClients(const Ref<Packet>& packet);
+		void SendPacketToClient(Ref<Connection> client, const Ref<Packet>& packet);
+		void SendPacketToClients(std::vector<Ref<Connection>>& clients, const Ref<Packet>& packet);
 
 	private:
 		bool ProcessRequest(Ref<Connection> client, const Ref<Packet>& packet);

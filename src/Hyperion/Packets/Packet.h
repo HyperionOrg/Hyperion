@@ -36,7 +36,7 @@ namespace Hyperion
 		{
 			Serialize();
 			VarInt packetSize(static_cast<int32_t>(m_Data.size()));
-			for(int i = packetSize.GetData().size() - 1; i >= 0; i--)
+			for(int i = static_cast<int>(packetSize.GetData().size()) - 1; i >= 0; i--)
 				m_Data.insert(m_Data.begin(), packetSize.GetData()[i]);
 		}
 

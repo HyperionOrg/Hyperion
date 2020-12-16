@@ -46,10 +46,6 @@ namespace Hyperion
 		void Run();
 		void Update();
 
-		void SendPacketToAllClients(const Ref<Packet>& packet);
-		void SendPacketToClient(Ref<Connection> client, const Ref<Packet>& packet);
-		void SendPacketToClients(std::vector<Ref<Connection>>& clients, const Ref<Packet>& packet);
-
 	private:
 		void Init();
 		void Shutdown();
