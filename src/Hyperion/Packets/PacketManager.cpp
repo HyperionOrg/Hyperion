@@ -58,11 +58,7 @@ namespace Hyperion
 			serverListPing.Players.Online = 0;
 			serverListPing.Players.Sample = { { "Test User", "e9013c2f-da01-425f-a48b-516f55e94386" } };
 
-			nlohmann::json serverListPingJson = serverListPing;
-
-			HP_DEBUG("{0}", serverListPingJson.dump(4));
-
-			Ref<PacketOutResponse> responsePacket = CreateRef<PacketOutResponse>(serverListPingJson.dump());
+			Ref<PacketOutResponse> responsePacket = CreateRef<PacketOutResponse>(static_cast<nlohmann::json>(serverListPingJson).dump());
 			SendPacketToClient(client, responsePacket); // Response Packet
 			ReadPacketFromClient(client); // Ping Packet
 			break;
