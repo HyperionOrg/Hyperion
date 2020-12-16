@@ -39,6 +39,12 @@ namespace Hyperion
 		void SendPacketToClient(Ref<Connection> client, const Ref<Packet>& packet);
 		void SendPacketToClients(std::vector<Ref<Connection>>& clients, const Ref<Packet>& packet);
 
+		void ReadPacketFromAllClients();
+		void ReadPacketFromClient(Ref<Connection> client);
+		void ReadPacketFromClients(std::vector<Ref<Connection>>& clients);
+
+		void KillInvalidClient(Ref<Connection> client);
+
 	private:
 		bool ProcessRequest(Ref<Connection> client, const Ref<Packet>& packet);
 	};

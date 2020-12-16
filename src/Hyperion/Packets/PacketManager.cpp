@@ -23,7 +23,7 @@ namespace Hyperion
 			case Hyperion::PacketInIds::HANDSHAKE:
 			{
 				Ref<PacketInHandshake> handshakePacket = CreateRef<PacketInHandshake>(packet);
-				client->ReadPacket(); // Request Packet
+				ReadPacketFromClient(client); // Request Packet
 				break;
 			}
 			case Hyperion::PacketInIds::PING:
@@ -48,11 +48,11 @@ namespace Hyperion
 		switch (m_LastPacketId)
 		{
 		case Hyperion::PacketInIds::HANDSHAKE:
-		
+
 		{
 			Ref<PacketOutResponse> responsePacket = CreateRef<PacketOutResponse>("{\"version\":{\"name\":\"1.16.4\",\"protocol\":754},\"players\":{\"max\":100,\"online\":5,\"sample\":[{\"name\":\"thinkofdeath\",\"id\":\"4566e69f-c907-48ee-8d71-d7ba5aa00d20\"}]},\"description\":{\"text\":\"Hello World\",\"color\":\"yellow\"}}");
 			SendPacketToClient(client, responsePacket); // Response Packet
-			client->ReadPacket(); // Ping Packet
+			ReadPacketFromClient(client); // Ping Packet
 			break;
 		}
 		case Hyperion::PacketInIds::PING:
@@ -74,6 +74,7 @@ namespace Hyperion
 			if (client && client->IsConnected())
 			{
 				client->SendPacket(packet);
+				KillInvalidClient(client);
 			}
 			else
 			{
@@ -92,6 +93,7 @@ namespace Hyperion
 		if (client && client->IsConnected())
 		{
 			client->SendPacket(packet);
+			KillInvalidClient(client);
 		}
 		else
 		{
@@ -109,6 +111,7 @@ namespace Hyperion
 			if (client && client->IsConnected())
 			{
 				client->SendPacket(packet);
+				KillInvalidClient(client);
 			}
 			else
 			{
@@ -120,5 +123,74 @@ namespace Hyperion
 
 		if (invalidClient)
 			m_Connections.erase(std::remove(m_Connections.begin(), m_Connections.end(), nullptr), m_Connections.end());
+	}
+
+	void PacketManager::ReadPacketFromAllClients()
+	{
+		bool invalidClient = false;
+		for (auto& client : m_Connections)
+		{
+			if (client && client->IsConnected())
+			{
+				client->ReadPacket();
+				KillInvalidClient(client);
+			}
+			else
+			{
+				m_DisconnectFunction(client);
+				client.reset();
+				invalidClient = true;
+			}
+		}
+
+		if (invalidClient)
+			m_Connections.erase(std::remove(m_Connections.begin(), m_Connections.end(), nullptr), m_Connections.end());
+	}
+
+	void PacketManager::ReadPacketFromClient(Ref<Connection> client)
+	{
+		if (client && client->IsConnected())
+		{
+			client->ReadPacket();
+			KillInvalidClient(client);
+		}
+		else
+		{
+			m_DisconnectFunction(client);
+			client.reset();
+			m_Connections.erase(std::remove(m_Connections.begin(), m_Connections.end(), client), m_Connections.end());
+		}
+	}
+
+	void PacketManager::ReadPacketFromClients(std::vector<Ref<Connection>>& clients)
+	{
+		bool invalidClient = false;
+		for (auto& client : clients)
+		{
+			if (client && client->IsConnected())
+			{
+				client->ReadPacket();
+				KillInvalidClient(client);
+			}
+			else
+			{
+				m_DisconnectFunction(client);
+				client.reset();
+				invalidClient = true;
+			}
+		}
+
+		if (invalidClient)
+			m_Connections.erase(std::remove(m_Connections.begin(), m_Connections.end(), nullptr), m_Connections.end());
+	}
+
+	void PacketManager::KillInvalidClient(Ref<Connection> client)
+	{
+		if (!client || !client->IsConnected())
+		{
+			m_DisconnectFunction(client);
+			client.reset();
+			m_Connections.erase(std::remove(m_Connections.begin(), m_Connections.end(), client), m_Connections.end());
+		}
 	}
 }
