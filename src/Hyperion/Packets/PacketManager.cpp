@@ -47,6 +47,7 @@ namespace Hyperion
 		{
 			Ref<PacketOutResponse> responsePacket = CreateRef<PacketOutResponse>("{\"version\":{\"name\":\"1.16.4\",\"protocol\":754},\"players\":{\"max\":100,\"online\":5,\"sample\":[{\"name\":\"thinkofdeath\",\"id\":\"4566e69f-c907-48ee-8d71-d7ba5aa00d20\"}]},\"description\":{\"text\":\"Hello World\",\"color\":\"yellow\"}}");
 			client->SendPacket(responsePacket); // Response Packet
+			client->ReadPacket(); // Ping Packet
 			break;
 		}
 		case Hyperion::PacketInIds::PING:
