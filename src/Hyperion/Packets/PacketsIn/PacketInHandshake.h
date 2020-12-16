@@ -25,7 +25,7 @@ namespace Hyperion
 
 		VarInt GetProtocolVersion() const { return m_ProtocolVersion; }
 		const std::string& GetServerAddress() const { return m_ServerAddress; }
-		uint8_t GetServerPort() const { return m_ServerPort; }
+		uint16_t GetServerPort() const { return m_ServerPort; }
 		State GetState() const { return m_State; }
 	};
 }

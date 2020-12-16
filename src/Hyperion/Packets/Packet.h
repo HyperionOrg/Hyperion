@@ -14,6 +14,8 @@ namespace Hyperion
 		VarInt m_Length;
 		std::vector<uint8_t> m_Data;
 
+		friend class Connection;
+
 	public:
 		Packet()
 			: m_Id(0), m_Length(0), m_Data({}) {}
@@ -33,13 +35,13 @@ namespace Hyperion
 		void Encode()
 		{
 			Serialize();
+			VarInt packetSize(static_cast<int32_t>(m_Data.size()));
+			for(int i = packetSize.GetData().size() - 1; i >= 0; i--)
+				m_Data.insert(m_Data.begin(), packetSize.GetData()[i]);
 		}
 
 		void Decode()
 		{
-			m_Length = VarInt(m_Data[0]);
-			m_Id = VarInt(m_Data[1]);
-			m_Data.erase(m_Data.begin(), m_Data.begin() + 2);
 			Deserialize();
 		}
 

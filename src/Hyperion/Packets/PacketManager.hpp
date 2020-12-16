@@ -21,7 +21,13 @@ namespace Hyperion
 
 	class PacketManager
 	{
+	private:
+		PacketInIds m_LastPacketId;
+
 	public:
 		void ProcessPacket(Ref<Connection> client, const Ref<Packet>& packet);
+
+	private:
+		bool ProcessRequest(Ref<Connection> client, const Ref<Packet>& packet);
 	};
 }

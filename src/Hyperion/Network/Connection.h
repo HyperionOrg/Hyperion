@@ -40,8 +40,9 @@ namespace Hyperion
 
 		size_t GetId() const { return m_Id; }
 
+		void ReadPacket();
+
 	private:
 		void WriteBody();
-		void ReadBody();
 	};
 }
