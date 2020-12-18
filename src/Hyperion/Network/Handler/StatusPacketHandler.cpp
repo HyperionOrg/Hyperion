@@ -2,11 +2,11 @@
 
 #include "Objects/ServerListPing.h"
 
-#include "Packets/PacketsIn/PacketInPing.h"
-#include "Packets/PacketsIn/PacketInRequest.h"
+#include "Packets/PacketsIn/Status/PacketInPing.h"
+#include "Packets/PacketsIn/Status/PacketInRequest.h"
 
-#include "Packets/PacketsOut/PacketOutPong.h"
-#include "Packets/PacketsOut/PacketOutResponse.h"
+#include "Packets/PacketsOut/Status/PacketOutPong.h"
+#include "Packets/PacketsOut/Status/PacketOutResponse.h"
 
 namespace Hyperion
 {

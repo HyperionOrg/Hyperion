@@ -1,6 +1,6 @@
 #include "HandshakePacketHandler.h"
 
-#include "Packets/PacketsIn/PacketInHandshake.h"
+#include "Packets/PacketsIn/Handshake/PacketInHandshake.h"
 
 namespace Hyperion
 {
