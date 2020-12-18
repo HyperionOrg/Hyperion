@@ -15,10 +15,10 @@ namespace Hyperion
 		UUID(uint64_t mostSignificantBits, uint64_t leastSignificantBits);
 		UUID(const std::string& uuid);
 
-		uint64_t GetMostSignificantBits();
-		uint64_t GetLeastSignificantBits();
+		uint64_t GetMostSignificantBits() const;
+		uint64_t GetLeastSignificantBits() const;
 
-		std::vector<uint8_t> GetBytes();
+		std::vector<uint8_t> GetBytes() const;
 
 		static UUID RandomUUID();
 

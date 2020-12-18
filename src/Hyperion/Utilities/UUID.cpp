@@ -1,5 +1,6 @@
 #include "UUID.h"
 
+#include <iomanip>
 #include <sstream>
 
 #include "Random.h"
@@ -35,17 +36,17 @@ namespace Hyperion
 			m_LeastSignificantBits |= ((bytes.at(i + sizeof(int64_t)) & 0xFF) << ((sizeof(uint64_t) - i - 1) * 8));
 	}
 
-	uint64_t UUID::GetMostSignificantBits()
+	uint64_t UUID::GetMostSignificantBits() const
 	{
 		return m_MostSignificantBits;
 	}
 
-	uint64_t UUID::GetLeastSignificantBits()
+	uint64_t UUID::GetLeastSignificantBits() const
 	{
 		return m_LeastSignificantBits;
 	}
 
-	std::vector<uint8_t> UUID::GetBytes()
+	std::vector<uint8_t> UUID::GetBytes() const
 	{
 		std::vector<uint8_t> bytes;
 
@@ -65,6 +66,13 @@ namespace Hyperion
 
 	UUID::operator std::string() const
 	{
+		std::stringstream ss;
+		ss << std::hex;
 
+		std::vector<uint8_t> bytes = GetBytes();
+		for (size_t i = 0; i < bytes.size(); i++)
+			ss << std::setw(2) << std::setfill('0') << bytes[i];
+
+		return ss.str();
 	}
 }
