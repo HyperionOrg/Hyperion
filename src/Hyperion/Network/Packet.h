@@ -3,6 +3,7 @@
 #include <vector>
 
 #include "Core.h"
+#include "Utilities/UUID.h"
 #include "Utilities/VarInt.h"
 
 namespace Hyperion
@@ -32,6 +33,12 @@ namespace Hyperion
 			std::vector<uint8_t> bytes = VarInt::Encode(value);
 			for (uint8_t byte : bytes)
 				m_Data.push_back(byte);
+		}
+
+		void WriteUUID(UUID uuid)
+		{
+			for (uint8_t byte : uuid.GetBytes())
+				WriteInt8(byte);
 		}
 
 		void WriteString(const std::string& value)
@@ -70,6 +77,13 @@ namespace Hyperion
 		int32_t ReadVarInt()
 		{
 			return VarInt::Decode(m_Data);
+		}
+
+		UUID ReadUUID()
+		{
+			int64_t mostSignificantBits = ReadInt64();
+			int64_t leastSignificantBits = ReadInt64();
+			return UUID(mostSignificantBits, leastSignificantBits);
 		}
 
 		std::string ReadString()
