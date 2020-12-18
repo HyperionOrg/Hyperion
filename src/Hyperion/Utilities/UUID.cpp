@@ -71,7 +71,7 @@ namespace Hyperion
 
 		std::vector<uint8_t> bytes = GetBytes();
 		for (size_t i = 0; i < bytes.size(); i++)
-			ss << std::setw(2) << std::setfill('0') << bytes[i];
+			ss << std::setw(2) << std::setfill('0') << static_cast<uint16_t>(bytes[i]);
 
 		return ss.str();
 	}
