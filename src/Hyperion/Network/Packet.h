@@ -91,7 +91,7 @@ namespace Hyperion
 			int64_t value = 0;
 
 			for (size_t i = 0; i < sizeof(int64_t); i++)
-				value |= (m_Data.at(i) << ((sizeof(int64_t) - i) * 8));
+				value |= ((m_Data.at(i) & 0xFF) << ((sizeof(int64_t) - i - 1) * 8));
 
 			m_Data.erase(m_Data.begin(), m_Data.begin() + sizeof(int64_t));
 			return value;
@@ -102,7 +102,7 @@ namespace Hyperion
 			int32_t value = 0;
 
 			for (size_t i = 0; i < sizeof(int32_t); i++)
-				value |= (m_Data.at(i) << ((sizeof(int32_t) - i) * 8));
+				value |= ((m_Data.at(i) & 0xFF) << ((sizeof(int32_t) - i - 1) * 8));
 
 			m_Data.erase(m_Data.begin(), m_Data.begin() + sizeof(int32_t));
 			return value;
@@ -113,7 +113,7 @@ namespace Hyperion
 			int16_t value = 0;
 
 			for (size_t i = 0; i < sizeof(int16_t); i++)
-				value |= (m_Data.at(i) << ((sizeof(int16_t) - i) * 8));
+				value |= ((m_Data.at(i) & 0xFF) << ((sizeof(int16_t) - i - 1) * 8));
 
 			m_Data.erase(m_Data.begin(), m_Data.begin() + sizeof(int16_t));
 			return value;
