@@ -5,7 +5,6 @@
 namespace Hyperion
 {
 	HyperionServer::HyperionServer()
-		: m_Port(25565), m_Acceptor(m_Context, asio::ip::tcp::endpoint(asio::ip::tcp::v4(), m_Port))
 	{
 		Init();
 	}
@@ -17,11 +16,35 @@ namespace Hyperion
 
 	void HyperionServer::Init()
 	{
+		m_Timer.Restart();
+	
 		Log::Init();
+		HP_INFO("Starting minecraft server version 1.16.4");
 
-		// TODO: Add config
+		HP_INFO("Loading properties");
+		m_Properties = Properties("server.properties");
+		if (m_Properties.Exists())
+		{
+			m_Properties.Load();
+		}
+		else
+		{
+			m_Properties.SetProperty("spawn-protection", 16);
+			m_Properties.SetProperty("gamemode", "creative");
+			m_Properties.SetProperty("pvp", true);
+			m_Properties.SetProperty("hardcore", false);
+			m_Properties.SetProperty("max-players", 1);
+			m_Properties.SetProperty("server-port", 25565);
+			m_Properties.SetProperty("white-list", false);
+			m_Properties.SetProperty("online-mode", true);
+			m_Properties.SetProperty("motd", "");
+			m_Properties.Store();
+		}
 
 		m_PacketManager = CreateScope<PacketManager>(m_Clients, std::bind(&HyperionServer::OnClientDisconnect, this, std::placeholders::_1));
+
+		std::optional<uint16_t> port = m_Properties.GetInt("server-port");
+		m_Acceptor = CreateScope<asio::ip::tcp::acceptor>(m_Context, asio::ip::tcp::endpoint(asio::ip::tcp::v4(), port.has_value() ? port.value() : 25565));
 	}
 
 	void HyperionServer::Start()
@@ -38,7 +61,8 @@ namespace Hyperion
 			return;
 		}
 
-		HP_INFO("Starting minecraft server version 1.16.4");
+		m_Timer.Stop();
+		HP_INFO("Done ({0}s)! For help, type \"help\"", m_Timer.Elapsed() / 1000.0);
 	}
 
 	void HyperionServer::Shutdown()
@@ -77,7 +101,7 @@ namespace Hyperion
 
 	void HyperionServer::WaitForClients()
 	{
-		m_Acceptor.async_accept([this](std::error_code connectionError, asio::ip::tcp::socket socket)
+		m_Acceptor->async_accept([this](std::error_code connectionError, asio::ip::tcp::socket socket)
 			{
 				if (connectionError)
 				{

@@ -17,28 +17,30 @@
 #include "Network/Connection.h"
 #include "Network/Packet.h"
 #include "Network/PacketManager.h"
+#include "Utilities/Properties.h"
 #include "Utilities/ThreadSafeQueue.h"
+#include "Utilities/Timer.h"
 
 namespace Hyperion
 {
 	class HyperionServer
 	{
 	private:
-		uint16_t m_Port;
-
+		Properties m_Properties;
 		Scope<PacketManager> m_PacketManager;
 
-		bool m_Running = true;
+		Timer m_Timer;
 
 		asio::io_context m_Context;
 		std::thread m_ContextThread;
 
-		asio::ip::tcp::acceptor m_Acceptor;
+		Scope<asio::ip::tcp::acceptor> m_Acceptor;
 		std::deque<Ref<Client>> m_Clients;
+		size_t m_ConnectionCounter = 0;
 
 		ThreadSafeQueue<OwnedPacket> m_PacketsQueue;
 
-		size_t m_ConnectionCounter = 0;
+		bool m_Running = true;
 
 	public:
 		HyperionServer();
