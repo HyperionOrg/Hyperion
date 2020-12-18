@@ -2,6 +2,8 @@
 
 #include <iostream>
 
+#include "Utilities/Random.h"
+
 namespace Hyperion
 {
 	HyperionServer::HyperionServer()
@@ -19,6 +21,7 @@ namespace Hyperion
 		m_Timer.Restart();
 	
 		Log::Init();
+		Random::Init();
 		HP_INFO("Starting minecraft server version 1.16.4");
 
 		HP_INFO("Loading properties");
