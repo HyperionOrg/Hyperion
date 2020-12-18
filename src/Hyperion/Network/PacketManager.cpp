@@ -7,11 +7,11 @@
 
 namespace Hyperion
 {
-	PacketManager::PacketManager(std::deque<Ref<Client>>& clients, std::function<void(Ref<Client>)> disconnectFunction)
-		: m_Clients(clients), m_DisconnectFunction(disconnectFunction)
+	PacketManager::PacketManager(Properties& properties, std::deque<Ref<Client>>& clients, std::function<void(Ref<Client>)> disconnectFunction)
+		: m_Properties(properties), m_Clients(clients), m_DisconnectFunction(disconnectFunction)
 	{
 		m_PacketHandlers[Client::State::HANDSHAKE] = CreateScope<HandshakePacketHandler>();
-		m_PacketHandlers[Client::State::STATUS] = CreateScope<StatusPacketHandler>();
+		m_PacketHandlers[Client::State::STATUS] = CreateScope<StatusPacketHandler>(m_Properties);
 		m_PacketHandlers[Client::State::LOGIN] = CreateScope<LoginPacketHandler>();
 		m_PacketHandlers[Client::State::PLAY] = CreateScope<PlayPacketHandler>();
 	}

@@ -10,6 +10,11 @@
 
 namespace Hyperion
 {
+	StatusPacketHandler::StatusPacketHandler(Properties& properties)
+		: m_Properties(properties)
+	{
+	}
+
 	void StatusPacketHandler::ProcessPacket(Ref<Client> client, const Ref<Packet> packet)
 	{
 		switch (packet->GetId())
@@ -17,11 +22,13 @@ namespace Hyperion
 		case 0x00:
 		{
 			Ref<PacketInRequest> packetRequest = ToPacket<PacketInRequest>(packet);
+			
+			std::optional<int32_t> maxPlayers = m_Properties.GetInt("max-players");
 
 			ServerListPingInfo serverListPing{};
 			serverListPing.Version.Name = "1.16.4";
 			serverListPing.Version.ProtocolVersion = 754;
-			serverListPing.Players.Max = 1000;
+			serverListPing.Players.Max = maxPlayers.has_value() ? maxPlayers.value() : -1;
 			serverListPing.Players.Online = 0;
 			serverListPing.Players.Sample = { { "Test User", "e9013c2f-da01-425f-a48b-516f55e94386" } };
 
@@ -34,7 +41,6 @@ namespace Hyperion
 			Ref<PacketInPing> packetPing = ToPacket<PacketInPing>(packet);
 
 			Ref<PacketOutPong> packetPong = CreateRef<PacketOutPong>(packetPing->GetPayload());
-
 			SendPacket(client, packetPong);
 			break;
 		}

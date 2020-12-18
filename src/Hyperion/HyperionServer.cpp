@@ -1,6 +1,7 @@
 #include "HyperionServer.h"
 
 #include <iostream>
+#include <fstream>
 
 #include "Utilities/Random.h"
 
@@ -33,18 +34,18 @@ namespace Hyperion
 		else
 		{
 			m_Properties.SetProperty("spawn-protection", 16);
-			m_Properties.SetProperty("gamemode", "creative");
+			m_Properties.SetProperty("gamemode", static_cast<std::string>("creative"));
 			m_Properties.SetProperty("pvp", true);
 			m_Properties.SetProperty("hardcore", false);
 			m_Properties.SetProperty("max-players", 1);
 			m_Properties.SetProperty("server-port", 25565);
 			m_Properties.SetProperty("white-list", false);
 			m_Properties.SetProperty("online-mode", true);
-			m_Properties.SetProperty("motd", "");
+			m_Properties.SetProperty("motd", static_cast<std::string>(""));
 			m_Properties.Store();
 		}
 
-		m_PacketManager = CreateScope<PacketManager>(m_Clients, std::bind(&HyperionServer::OnClientDisconnect, this, std::placeholders::_1));
+		m_PacketManager = CreateScope<PacketManager>(m_Properties, m_Clients, std::bind(&HyperionServer::OnClientDisconnect, this, std::placeholders::_1));
 
 		std::optional<uint16_t> port = m_Properties.GetInt("server-port");
 		m_Acceptor = CreateScope<asio::ip::tcp::acceptor>(m_Context, asio::ip::tcp::endpoint(asio::ip::tcp::v4(), port.has_value() ? port.value() : 25565));
