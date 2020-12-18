@@ -9,14 +9,17 @@
 #include <asio.hpp>
 
 #include "Core.h"
-#include "Packets/Packet.h"
+#include "Network/Packet.h"
 #include "Utilities/ThreadSafeQueue.h"
 
 namespace Hyperion
 {
+	class Client;
+
 	class Connection : public std::enable_shared_from_this<Connection>
 	{
 	private:
+		Ref<Client> m_Client;
 		asio::io_context& m_Context;
 		asio::ip::tcp::socket m_Socket;
 
@@ -29,14 +32,14 @@ namespace Hyperion
 		Ref<Packet> m_TempPacket;
 
 	public:
-		Connection(asio::io_context& context, asio::ip::tcp::socket socket, ThreadSafeQueue<OwnedPacket>& packetsIn);
+		Connection(Ref<Client> client, asio::io_context& context, asio::ip::tcp::socket socket, ThreadSafeQueue<OwnedPacket>& packetsIn);
 		~Connection();
 		
 		void ConnectToClient(size_t id = 0);
 		void Disconnect();
 
 		void SendPacket(const Ref<Packet>& packet);
-		void ReadPackets();
+		void ReadNextPackets();
 	
 		bool IsConnected() const;
 

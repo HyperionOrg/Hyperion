@@ -2,9 +2,7 @@
 
 namespace Hyperion
 {
-	PacketInRequest::PacketInRequest(const Ref<Packet> packet)
-		: Packet(packet)
+	PacketInRequest::PacketInRequest()
 	{
-		Decode();
 	}
 }

@@ -1,6 +1,6 @@
 #pragma once
 
-#include "Packets/Packet.h"
+#include "Network/Packet.h"
 
 namespace Hyperion
 {
@@ -10,10 +10,11 @@ namespace Hyperion
 		int64_t m_Payload;
 
 	public:
-		PacketInPing(const Ref<Packet> packet);
-
-		virtual void Deserialize() override;
+		PacketInPing();
 
 		int64_t GetPayload() const { return m_Payload; }
+
+	protected:
+		virtual void Deserialize() override;
 	};
 }

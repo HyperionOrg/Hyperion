@@ -1,7 +1,9 @@
 #pragma once
 
 #ifdef _WIN32
+#ifndef _WIN32_WINNT
 #define _WIN32_WINNT 0x0601
+#endif
 #endif
 
 #include <asio.hpp>
@@ -11,8 +13,10 @@
 #include <vector>
 
 #include "Core.h"
+#include "Network/Client.h"
 #include "Network/Connection.h"
-#include "Packets/PacketManager.h"
+#include "Network/Packet.h"
+#include "Network/PacketManager.h"
 #include "Utilities/ThreadSafeQueue.h"
 
 namespace Hyperion
@@ -20,19 +24,17 @@ namespace Hyperion
 	class HyperionServer
 	{
 	private:
-		/* Data */
 		uint16_t m_Port;
 
 		Scope<PacketManager> m_PacketManager;
 
 		bool m_Running = true;
 
-		/* Networking */
 		asio::io_context m_Context;
 		std::thread m_ContextThread;
 
 		asio::ip::tcp::acceptor m_Acceptor;
-		std::deque<Ref<Connection>> m_Connections;
+		std::deque<Ref<Client>> m_Clients;
 
 		ThreadSafeQueue<OwnedPacket> m_PacketsQueue;
 
@@ -44,7 +46,6 @@ namespace Hyperion
 
 		void Start();
 		void Run();
-		void Update();
 
 	private:
 		void Init();
@@ -52,7 +53,7 @@ namespace Hyperion
 
 		void WaitForClients();
 
-		bool OnClientConnect(Ref<Connection> client);
-		void OnClientDisconnect(Ref<Connection> client);
+		void OnClientConnect(Ref<Client> client);
+		void OnClientDisconnect(Ref<Client> client);
 	};
 }

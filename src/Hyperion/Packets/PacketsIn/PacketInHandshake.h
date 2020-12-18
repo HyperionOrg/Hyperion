@@ -1,31 +1,33 @@
 #pragma once
 
-#include "Packets/Packet.h"
+#include "Network/Packet.h"
 
 namespace Hyperion
 {
-	enum class State : uint8_t
-	{
-		STATUS = 1,
-		LOGIN = 2
-	};
-
 	class PacketInHandshake : public Packet
 	{
+	public:
+		enum class State : uint8_t
+		{
+			STATUS = 1,
+			LOGIN = 2
+		};
+
 	private:
-		VarInt m_ProtocolVersion;
+		int32_t m_ProtocolVersion;
 		std::string m_ServerAddress;
-		uint16_t m_ServerPort;
-		State m_State;
+		int16_t m_ServerPort;
+		State m_NextState;
 
 	public:
-		PacketInHandshake(const Ref<Packet> packet);
+		PacketInHandshake();
 
-		virtual void Deserialize() override;
-
-		VarInt GetProtocolVersion() const { return m_ProtocolVersion; }
+		int32_t GetProtocolVersion() const { return m_ProtocolVersion; }
 		const std::string& GetServerAddress() const { return m_ServerAddress; }
-		uint16_t GetServerPort() const { return m_ServerPort; }
-		State GetState() const { return m_State; }
+		int16_t GetServerPort() const { return m_ServerPort; }
+		State GetNextState() const { return m_NextState; }
+
+	protected:
+		virtual void Deserialize() override;
 	};
 }

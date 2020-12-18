@@ -2,21 +2,16 @@
 
 namespace Hyperion
 {
-	PacketInHandshake::PacketInHandshake(const Ref<Packet> packet)
-		: Packet(packet), m_ProtocolVersion(0), m_ServerAddress(""), m_ServerPort(0), m_State(State::STATUS)
+	PacketInHandshake::PacketInHandshake()
+		: m_ProtocolVersion(0), m_ServerAddress(""), m_ServerPort(0), m_NextState(State::STATUS)
 	{
-		Decode();
 	}
 
 	void PacketInHandshake::Deserialize()
 	{
-		m_ProtocolVersion = VarInt::Decode({ m_Data[0], m_Data[1] });
-
-		for (size_t i = 3; i < VarInt::Decode(m_Data[2]) + 3UL; i++)
-			m_ServerAddress += static_cast<char>(m_Data[i]);
-
-		m_ServerPort = static_cast<uint16_t>(static_cast<uint16_t>(m_Data[12]) | m_Data[13]);
-
-		m_State = static_cast<State>(m_Data[14]);
+		m_ProtocolVersion = ReadVarInt();
+		m_ServerAddress = ReadString();
+		m_ServerPort = ReadInt16();
+		m_NextState = static_cast<State>(ReadInt8());
 	}
 }

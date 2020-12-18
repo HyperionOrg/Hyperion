@@ -2,18 +2,46 @@
 
 #include <vector>
 
-class VarLong
+#include "Core.h"
+
+namespace VarLong
 {
-private:
-	std::vector<uint8_t> m_Data;
+	inline int64_t Decode(std::vector<uint8_t>& bytes)
+	{
+		size_t index = 0;
 
-public:
-	VarLong() = default;
-	VarLong(uint8_t firstByte);
-	VarLong(int64_t value);
+		int32_t numbersRead = 0;
+		int64_t result = 0;
+		int8_t byteRead = 0;
+		do
+		{
+			byteRead = bytes[index];
+			int64_t value = (byteRead & 0b01111111);
+			result |= (value << (7 * numbersRead));
 
-	const std::vector<uint8_t>& GetData() const { return m_Data; }
+			HP_ASSERT(numbersRead++ <= 10, "VarLong is too big!");
 
-	static int64_t Decode(const std::vector<uint8_t>& values);
-	static int64_t Decode(const VarLong& varLong);
+			index++;
+		} while ((byteRead & 0b10000000) != 0);
+
+		bytes.erase(bytes.begin(), bytes.begin() + index);
+
+		return result;
+	}
+
+	inline std::vector<uint8_t> Encode(int64_t value)
+	{
+		std::vector<uint8_t> data;
+		do
+		{
+			auto temp = static_cast<int8_t>(value & 0b01111111);
+			value = value >> 7;
+
+			if (value != 0)
+				temp |= 0b10000000;
+
+			data.push_back(temp);
+		} while (value != 0);
+		return data;
+	}
 };

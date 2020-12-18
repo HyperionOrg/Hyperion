@@ -6,7 +6,6 @@ namespace Hyperion
 {
 	HyperionServer::HyperionServer()
 		: m_Port(25565), m_Acceptor(m_Context, asio::ip::tcp::endpoint(asio::ip::tcp::v4(), m_Port))
-		// TODO: Adding Configuration / Properties
 	{
 		Init();
 	}
@@ -20,7 +19,9 @@ namespace Hyperion
 	{
 		Log::Init();
 
-		m_PacketManager = CreateScope<PacketManager>(m_Connections, std::bind(&HyperionServer::OnClientDisconnect, this, std::placeholders::_1));
+		// TODO: Add config
+
+		m_PacketManager = CreateScope<PacketManager>(m_Clients, std::bind(&HyperionServer::OnClientDisconnect, this, std::placeholders::_1));
 	}
 
 	void HyperionServer::Start()
@@ -55,24 +56,22 @@ namespace Hyperion
 
 		while (m_Running)
 		{
-			Update();
-		}
-	}
+			for (auto& client : m_Clients)
+			{
+				if (client->ReadNextPackets())
+					continue;
+				OnClientDisconnect(client);
+				client.reset();
+				m_Clients.erase(std::remove(m_Clients.begin(), m_Clients.end(), client), m_Clients.end());
+			}
 
-	void HyperionServer::Update()
-	{
-		for (auto& connection : m_Connections)
-		{
-			if (connection && connection->IsConnected())
-				connection->ReadPackets();
-			m_PacketManager->KillInvalidClient(connection);
-		}
+			while (!m_PacketsQueue.empty())
+			{
+				auto packet = m_PacketsQueue.pop_front();
+				m_PacketManager->ProcessPacket(packet.Remote, packet.Packet);
+			}
 
-		while (!m_PacketsQueue.empty())
-		{
-			auto packet = m_PacketsQueue.pop_front();
-
-			m_PacketManager->ProcessPacket(packet.Remote, packet.Packet);
+			// TODO: Implement async commands
 		}
 	}
 
@@ -87,33 +86,24 @@ namespace Hyperion
 				}
 				else
 				{
-					HP_INFO("New Connection: {0}", socket.remote_endpoint().address().to_string());
-					Ref<Connection> connection = CreateRef<Connection>(m_Context, std::move(socket), m_PacketsQueue);
+					Ref<Client> client = CreateRef<Client>();
+					client->Init(m_Context, std::move(socket), m_PacketsQueue);
 
-					if (OnClientConnect(connection))
-					{
-						m_Connections.push_back(std::move(connection));
-						m_Connections.back()->ConnectToClient(m_ConnectionCounter++);
-						HP_INFO("Connection {0} Approved! (Current alive Connections: {1})", m_Connections.back()->GetId(), m_Connections.size());
-					}
-					else
-					{
-						HP_INFO("Connection Denied!");
-					}
+					OnClientConnect(client);
+
+					m_Clients.push_back(std::move(client));
+					m_Clients.back()->ConnectClient(m_ConnectionCounter++);
 
 					WaitForClients();
 				}
 			});
 	}
 
-	bool HyperionServer::OnClientConnect(Ref<Connection> client)
+	void HyperionServer::OnClientConnect(Ref<Client> client)
 	{
-		HP_INFO("Client Connected");
-		return true;
 	}
 
-	void HyperionServer::OnClientDisconnect(Ref<Connection> client)
+	void HyperionServer::OnClientDisconnect(Ref<Client> client)
 	{
-		HP_INFO("Client Disconnected");
 	}
 }

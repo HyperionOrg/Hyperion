@@ -1,9 +1,11 @@
 #include "Connection.h"
 
+#include "Client.h"
+
 namespace Hyperion
 {
-	Connection::Connection(asio::io_context& context, asio::ip::tcp::socket socket, ThreadSafeQueue<OwnedPacket>& packetsIn)
-		: m_Context(context), m_Socket(std::move(socket)), m_PacketsIn(packetsIn)
+	Connection::Connection(Ref<Client> client, asio::io_context& context, asio::ip::tcp::socket socket, ThreadSafeQueue<OwnedPacket>& packetsIn)
+		: m_Client(client), m_Context(context), m_Socket(std::move(socket)), m_PacketsIn(packetsIn)
 	{
 		m_TempPacket = CreateRef<Packet>();
 	}
@@ -18,14 +20,19 @@ namespace Hyperion
 		if (IsConnected())
 		{
 			m_Id = id;
-			ReadPackets();
+			ReadNextPackets();
 		}
 	}
 
 	void Connection::Disconnect()
 	{
 		if (IsConnected())
-			asio::post(m_Context, [this]() { m_Socket.close(); });
+		{
+			asio::post(m_Context, [this]()
+				{
+					m_Socket.close();
+				});
+		}
 	}
 
 	void Connection::SendPacket(const Ref<Packet>& packet)
@@ -41,12 +48,11 @@ namespace Hyperion
 			});
 	}
 
-	void Connection::ReadPackets()
+	void Connection::ReadNextPackets()
 	{
-		if (IsConnected())
+		if (m_Socket.available() > 0 && !m_Reading)
 		{
-			if (m_Socket.available() > 0 && !m_Reading)
-				ReadPacket();
+			ReadPacket();
 		}
 	}
 
@@ -57,7 +63,7 @@ namespace Hyperion
 
 	void Connection::WritePacket()
 	{
-		asio::async_write(m_Socket, asio::buffer(m_PacketsOut.front()->GetData()), [this](std::error_code writeError, size_t length)
+		asio::async_write(m_Socket, asio::buffer(m_PacketsOut.front()->m_Data), [this](std::error_code writeError, size_t length)
 			{
 				if (writeError)
 				{
@@ -78,10 +84,11 @@ namespace Hyperion
 	void Connection::ReadPacket()
 	{
 		m_Reading = true;
-		asio::async_read(m_Socket, asio::buffer(m_TempPacket->GetData()), [this](std::error_code sizeError, size_t sizeReadSize)
+
+		m_TempPacket->m_Data.resize(1);
+		asio::async_read(m_Socket, asio::buffer(m_TempPacket->m_Data), [this](std::error_code sizeError, size_t sizeReadSize)
 			{
-				if (m_TempPacket->GetData()[0] < 250)
-					if (sizeError)
+					if (sizeError || m_TempPacket->m_Data.front() > 250)
 					{
 						HP_ERROR("Connection {0} - Size reading error: {1}", m_Id, sizeError.message());
 						HP_ASSERT(sizeError == asio::error::eof, "Read Size failed!");
@@ -89,10 +96,10 @@ namespace Hyperion
 					}
 					else
 					{
-						int32_t dataSize = VarInt::Decode(m_TempPacket->GetData()[0]);
-						m_TempPacket->GetData().resize(dataSize);
+						int32_t dataSize = VarInt::Decode(m_TempPacket->m_Data);
+						m_TempPacket->m_Data.resize(dataSize);
 
-						asio::async_read(m_Socket, asio::buffer(m_TempPacket->GetData()), [this, dataSize](std::error_code bodyError, size_t dataReadSize)
+						asio::async_read(m_Socket, asio::buffer(m_TempPacket->m_Data), [this, dataSize](std::error_code bodyError, size_t dataReadSize)
 							{
 								if (bodyError)
 								{
@@ -102,13 +109,12 @@ namespace Hyperion
 								}
 								else
 								{
-									m_TempPacket->GetData().resize(dataReadSize);
+									m_TempPacket->m_Data.insert(m_TempPacket->m_Data.begin(), dataSize);
 
-									m_TempPacket->m_Length = dataSize;
-									m_TempPacket->m_Id = VarInt::Decode(m_TempPacket->GetData()[0]);
-									m_TempPacket->GetData().erase(m_TempPacket->GetData().begin());
+									m_TempPacket->m_Length = VarInt::Decode(m_TempPacket->m_Data);
+									m_TempPacket->m_Id = VarInt::Decode(m_TempPacket->m_Data);
 
-									m_PacketsIn.push_back({ this->shared_from_this(), m_TempPacket });
+									m_PacketsIn.push_back({ m_Client, m_TempPacket });
 									m_Reading = false;
 								}
 							});

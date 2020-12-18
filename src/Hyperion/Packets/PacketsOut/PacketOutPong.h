@@ -1,6 +1,6 @@
 #pragma once
 
-#include "Packets/Packet.h"
+#include "Network/Packet.h"
 
 namespace Hyperion
 {
