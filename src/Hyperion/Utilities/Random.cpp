@@ -87,7 +87,7 @@ namespace Hyperion
 		return static_cast<float>(distribution(s_RandomEngine));
 	}
 	
-	float Random::Float(int start, int end)
+	float Random::Float(float start, float end)
 	{
 		std::uniform_real_distribution<float> distribution(start, end);
 		return static_cast<float>(distribution(s_RandomEngine));
@@ -99,7 +99,7 @@ namespace Hyperion
 		return static_cast<double>(distribution(s_RandomEngine));
 	}
 	
-	double Random::Double(int start, int end)
+	double Random::Double(double start, double end)
 	{
 		std::uniform_real_distribution<double> distribution(start, end);
 		return static_cast<double>(distribution(s_RandomEngine));

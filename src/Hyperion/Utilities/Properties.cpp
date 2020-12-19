@@ -59,7 +59,6 @@ namespace Hyperion
 		return FileUtils::Exists(m_FilePath);
 	}
 
-
 	void Properties::SetProperty(const std::string& key, bool value)
 	{
 		m_Data[key] = value;

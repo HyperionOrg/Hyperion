@@ -31,10 +31,10 @@ namespace Hyperion
 		static uint64_t UInt64(uint64_t start, uint64_t end);
 
 		static float Float();
-		static float Float(int start, int end);
+		static float Float(float start, float end);
 
 		static double Double();
-		static double Double(int start, int end);
+		static double Double(double start, double end);
 
 		static bool Bool();
 	};
