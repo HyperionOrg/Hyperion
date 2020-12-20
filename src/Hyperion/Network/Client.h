@@ -23,6 +23,7 @@ namespace Hyperion
 		Ref<Connection> m_Connection;
 
 		friend class HandshakePacketHandler;
+		friend class LoginPacketHandler;
 
 	public:
 		Client();
