@@ -5,6 +5,8 @@
 #include <string>
 #include <vector>
 
+#include "Core.h"
+
 namespace Hyperion
 {
 	struct ServerListPingInfo
@@ -27,6 +29,8 @@ namespace Hyperion
 			};
 			std::vector<SampleInfo> Sample;
 		} Players;
+
+		std::string Motd;
 	};
 
 	void to_json(nlohmann::json& json, const ServerListPingInfo::VersionInfo& versionInfo)
@@ -65,7 +69,10 @@ namespace Hyperion
 
 	void to_json(nlohmann::json& json, const ServerListPingInfo& serverListPingInfo)
 	{
-		json = nlohmann::json{ { "version", serverListPingInfo.Version}, { "players", serverListPingInfo.Players } };
+		nlohmann::json description;
+		description["text"] = serverListPingInfo.Motd;
+		json = nlohmann::json{ { "version", serverListPingInfo.Version}, { "players", serverListPingInfo.Players }, { "description", description } };
+		HP_DEBUG("{0}", json.dump(4));
 	}
 
 	void from_json(const nlohmann::json& json, ServerListPingInfo& serverListPingInfo)

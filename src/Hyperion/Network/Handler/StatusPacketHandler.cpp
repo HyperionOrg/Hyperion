@@ -24,6 +24,7 @@ namespace Hyperion
 			Ref<PacketInRequest> packetRequest = ToPacket<PacketInRequest>(packet);
 			
 			std::optional<int32_t> maxPlayers = m_Properties.GetInt("max-players");
+			std::optional<std::string> motd = m_Properties.GetString("motd");
 
 			ServerListPingInfo serverListPing{};
 			serverListPing.Version.Name = "1.16.4";
@@ -31,6 +32,7 @@ namespace Hyperion
 			serverListPing.Players.Max = maxPlayers.has_value() ? maxPlayers.value() : -1;
 			serverListPing.Players.Online = 0;
 			serverListPing.Players.Sample = { { "Test User", "e9013c2f-da01-425f-a48b-516f55e94386" } };
+			serverListPing.Motd = motd.has_value() ? motd.value() : "";
 
 			Ref<PacketOutResponse> responsePacket = CreateRef<PacketOutResponse>(static_cast<nlohmann::json>(serverListPing).dump());
 			SendPacket(client, responsePacket);
