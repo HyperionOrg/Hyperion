@@ -30,46 +30,34 @@ namespace Hyperion
 	void Properties::Load()
 	{
 		HP_ASSERT(FileUtils::IsFile(m_FilePath), "Properties Path is not a file!");
-		HP_ASSERT(FileUtils::Exists(m_FilePath), "Properties Path doesn't exists!");
 
-		FileUtils::ReadFile(m_FilePath, [this](const std::string& line)
-			{
-				std::string key = line.substr(0, line.find_first_of("="));
-				std::string value = line.substr(line.find_first_of("=") + 1, line.length());
-
-				std::string::const_iterator it = value.begin();
-				while (it != value.end() && std::isdigit(*it)) ++it;
-				if (it == value.end())
+		if (FileUtils::Exists(m_FilePath))
+		{
+			FileUtils::ReadFile(m_FilePath, [this](const std::string& line)
 				{
-					m_Data[key] = std::stoi(value);
-				}
-				else if (value == "true" || value == "false")
-				{
-					m_Data[key] = (value == "true");
-				}
-				else
-				{
-					m_Data[key] = value;
-				}
-			});
+					std::string key = line.substr(0, line.find_first_of("="));
+					std::string value = line.substr(line.find_first_of("=") + 1, line.length());
+
+					if (value.empty() || value == "")
+					{
+						m_Data[key] = value;
+					}
+					else
+					{
+						std::string::const_iterator it = value.begin();
+						while (it != value.end() && std::isdigit(*it)) ++it;
+						if (it == value.end())
+							m_Data[key] = std::stoi(value);
+						else if (value == "true" || value == "false")
+							m_Data[key] = (value == "true");
+						else
+							m_Data[key] = value;
+					}
+				});
+		}
 	}
 
-	bool Properties::Exists()
-	{
-		return FileUtils::Exists(m_FilePath);
-	}
-
-	void Properties::SetProperty(const std::string& key, bool value)
-	{
-		m_Data[key] = value;
-	}
-
-	void Properties::SetProperty(const std::string& key, int32_t value)
-	{
-		m_Data[key] = value;
-	}
-
-	void Properties::SetProperty(const std::string& key, const std::string& value)
+	void Properties::SetProperty(const std::string& key, PropertiesType value)
 	{
 		m_Data[key] = value;
 	}

@@ -14,36 +14,29 @@ namespace Hyperion
 
 	HyperionServer::~HyperionServer()
 	{
-		Shutdown();
+		//Shutdown();
 	}
 
 	void HyperionServer::Init()
 	{
-		m_Timer.Restart();
-	
 		Log::Init();
-		Random::Init();
+
 		HP_INFO("Starting minecraft server version 1.16.4");
+		Random::Init();
 
 		HP_INFO("Loading properties");
 		m_Properties = Properties("server.properties");
-		if (m_Properties.Exists())
-		{
-			m_Properties.Load();
-		}
-		else
-		{
-			m_Properties.SetProperty("spawn-protection", 16);
-			m_Properties.SetProperty("gamemode", static_cast<std::string>("creative"));
-			m_Properties.SetProperty("pvp", true);
-			m_Properties.SetProperty("hardcore", false);
-			m_Properties.SetProperty("max-players", 1);
-			m_Properties.SetProperty("server-port", 25565);
-			m_Properties.SetProperty("white-list", false);
-			m_Properties.SetProperty("online-mode", true);
-			m_Properties.SetProperty("motd", static_cast<std::string>(""));
-			m_Properties.Store();
-		}
+		m_Properties.SetProperty("spawn-protection", 16);
+		m_Properties.SetProperty("gamemode", static_cast<std::string>("creative"));
+		m_Properties.SetProperty("pvp", true);
+		m_Properties.SetProperty("hardcore", false);
+		m_Properties.SetProperty("max-players", 1);
+		m_Properties.SetProperty("server-port", 25565);
+		m_Properties.SetProperty("white-list", false);
+		m_Properties.SetProperty("online-mode", true);
+		m_Properties.SetProperty("motd", static_cast<std::string>(""));
+		m_Properties.Load();
+		m_Properties.Store();
 
 		m_PacketManager = CreateScope<PacketManager>(m_Properties, m_Clients, std::bind(&HyperionServer::OnClientDisconnect, this, std::placeholders::_1));
 
@@ -67,6 +60,20 @@ namespace Hyperion
 
 		m_Timer.Stop();
 		HP_INFO("Done ({0}s)! For help, type \"help\"", m_Timer.Elapsed() / 1000.0);
+
+		m_CommandThread = std::thread([this]()
+			{
+				std::string line;
+				while (std::getline(std::cin, line))
+				{
+					if (line == "stop")
+					{
+						Shutdown();
+						m_Running = false;
+						break;
+					}
+				}
+			});
 	}
 
 	void HyperionServer::Shutdown()

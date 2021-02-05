@@ -28,6 +28,7 @@ namespace Hyperion
 	private:
 		Properties m_Properties;
 		Scope<PacketManager> m_PacketManager;
+		std::thread m_CommandThread;
 
 		Timer m_Timer;
 

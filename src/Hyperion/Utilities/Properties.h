@@ -21,11 +21,7 @@ namespace Hyperion
 		void Store();
 		void Load();
 
-		bool Exists();
-
-		void SetProperty(const std::string& key, bool value);
-		void SetProperty(const std::string& key, int32_t value);
-		void SetProperty(const std::string& key, const std::string& value);
+		void SetProperty(const std::string& key, PropertiesType value);
 
 		std::optional<bool> GetBool(const std::string& key);
 		std::optional<int32_t> GetInt(const std::string& key);

@@ -29,11 +29,11 @@ namespace Hyperion
 			bytes.push_back(byte);
 		}
 
-		for (size_t i = 0; i < sizeof(int64_t); i++)
-			m_MostSignificantBits |= ((bytes.at(i) & 0xFF) << ((sizeof(uint64_t) - i - 1) * 8));
+		for (size_t i = 0; i < sizeof(uint64_t); i++)
+			m_MostSignificantBits |= ((bytes.at(i) & 0xFF) << static_cast<uint64_t>((sizeof(uint64_t) - i - 1) * 8));
 
-		for (size_t i = 0; i < sizeof(int64_t); i++)
-			m_LeastSignificantBits |= ((bytes.at(i + sizeof(int64_t)) & 0xFF) << ((sizeof(uint64_t) - i - 1) * 8));
+		for (size_t i = 0; i < sizeof(uint64_t); i++)
+			m_LeastSignificantBits |= ((bytes.at(i + sizeof(int64_t)) & 0xFF) << static_cast<uint64_t>((sizeof(uint64_t) - i - 1) * 8));
 	}
 
 	uint64_t UUID::GetMostSignificantBits() const
