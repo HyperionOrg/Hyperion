@@ -3,8 +3,12 @@
 
 This repository houses the source code for Hyperion.
 
+## Installing
+In order to even build the minecraft server you have to install OpenSSL<br>
+You can download the OpenSSL binaries<a href="https://wiki.openssl.org/index.php/Binaries">here</a>.<br>
+
 ## Building
-In order to build the engine, you will need to follow these steps:
+In order to build the minecraft server, you will need to follow these steps:
 1.  Start cloning the repository by typing in the command prompt of your choice:<br><code>git clone --recurse-submodules <a href="https://github.com/SkillerRaptor/Hyperion">https://github.com/SkillerRaptor/Hyperion</a></code>.
 2.  Inside the repository directory you have to run `cmake -G "Visual Studio 16 2019" -A x64 -H. -Bbuild`
 
