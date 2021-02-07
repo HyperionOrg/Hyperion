@@ -31,15 +31,14 @@
 *.app
 
 # Visual Studio
-.vs/
-*.sln
-**/*.vcxproj
-**/*.filters
-**/*.user
+build/
+**.vs
+**.sln
+**.vcxproj
+**.filters
+**.user
 /bin/
 /bin-int/
-*/*/*/bin/
-*/*/*/bin-int/
 
 # Visual C++ cache files
 ipch/
@@ -54,6 +53,3 @@ ipch/
 *.ini
 *.cfg
 *.json
-
-# Dependencies Libs
-!/HyperEngine/vendor/**/lib/*.lib
