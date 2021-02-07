@@ -1,6 +1,7 @@
 #pragma once
 
 #include <spdlog/spdlog.h>
+#include <spdlog/pattern_formatter.h>
 
 #include "Core.h"
 
@@ -11,7 +12,7 @@ namespace Hyperion
 	public:
 		void format(const spdlog::details::log_msg& message, const std::tm& time, spdlog::memory_buf_t& destination) override;
 
-		std::unique_ptr<custom_flag_formatter> clone() const override;
+		virtual std::unique_ptr<custom_flag_formatter> clone() const override;
 	};
 
 	class Log
