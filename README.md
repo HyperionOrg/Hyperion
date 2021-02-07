@@ -4,8 +4,8 @@
 This repository houses the source code for Hyperion.
 
 ## Installing
-In order to even build the minecraft server you have to install OpenSSL<br>
-You can download the OpenSSL binaries<a href="https://wiki.openssl.org/index.php/Binaries">here</a>.<br>
+In order to even build the minecraft server you have to install OpenSSL.<br>
+You can download the OpenSSL binaries <a href="https://wiki.openssl.org/index.php/Binaries">here</a>.<br>
 
 ## Building
 In order to build the minecraft server, you will need to follow these steps:
