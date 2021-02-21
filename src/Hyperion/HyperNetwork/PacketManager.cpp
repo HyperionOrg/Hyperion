@@ -7,7 +7,7 @@
 
 namespace Hyperion
 {
-	PacketManager::PacketManager(Properties& properties, std::vector<Ref<Client>>& clients)
+	PacketManager::PacketManager(Properties& properties, std::deque<Ref<Client>>& clients)
 		: m_Properties(properties), m_Clients(clients)
 	{
 		m_PacketHandlers[Client::State::HANDSHAKE] = CreateScope<HandshakePacketHandler>();
@@ -18,7 +18,6 @@ namespace Hyperion
 
 	void PacketManager::ProcessPacket(Ref<Client> client, const Ref<Packet>& packet)
 	{
-		HP_INFO("Packed received: {0} -> {1}", client->GetConnectionId(), packet->GetId());
 		m_PacketHandlers[client->GetCurrentState()]->ProcessPacket(client, packet);
 	}
 }

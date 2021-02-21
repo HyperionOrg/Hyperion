@@ -25,7 +25,7 @@ namespace Hyperion
 		HP_INFO("Starting minecraft server version 1.16.5");
 		m_Timer.Start();
 
-		HP_INFO("Loading properties");
+		HP_INFO("Loading properties...");
 		m_Properties.SetProperty("spawn-protection", 16);
 		m_Properties.SetProperty("gamemode", static_cast<std::string>("creative"));
 		m_Properties.SetProperty("pvp", true);
@@ -42,6 +42,8 @@ namespace Hyperion
 
 		std::optional<uint16_t> port = m_Properties.GetInt("server-port");
 		m_Acceptor = CreateScope<asio::ip::tcp::acceptor>(m_Context, asio::ip::tcp::endpoint(asio::ip::tcp::v4(), port.has_value() ? port.value() : 25565));
+	
+		Start();
 	}
 
 	void HyperionServer::Start()
@@ -87,13 +89,15 @@ namespace Hyperion
 	{
 		while (m_Running)
 		{
-			for (std::vector<Ref<Client>>::iterator it = m_Clients.begin(); it != m_Clients.end(); it++)
+			if (!m_Clients.empty())
 			{
-				Ref<Client> client = *it;
-				if (client->ReadNextPackets())
-					continue;
-				client.reset();
-				m_Clients.erase(it++);
+				for (Ref<Client>& client : m_Clients)
+				{
+					if (client && client->ReadNextPackets())
+						continue;
+					client.reset();
+					m_Clients.erase(std::remove(m_Clients.begin(), m_Clients.end(), client), m_Clients.end());
+				}
 			}
 
 			while (!m_PacketsQueue.empty())
@@ -118,11 +122,13 @@ namespace Hyperion
 
 				Ref<Client> client = CreateRef<Client>();
 				client->Init(m_Context, std::move(socket), m_PacketsQueue);
+				HP_INFO("Client Connected");
 
-				m_Clients.push_back(client);
+				m_Clients.push_back(std::move(client));
 				m_Clients.back()->ConnectClient(m_ConnectionCounter++);
 
 				WaitForClients();
+
 			});
 	}
 }

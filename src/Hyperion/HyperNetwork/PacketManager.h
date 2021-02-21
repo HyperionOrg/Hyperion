@@ -16,12 +16,12 @@ namespace Hyperion
 	{
 	private:
 		Properties& m_Properties;
-		std::vector<Ref<Client>>& m_Clients;
+		std::deque<Ref<Client>>& m_Clients;
 
 		std::unordered_map<Client::State, Scope<PacketHandler>> m_PacketHandlers;
 
 	public:
-		PacketManager(Properties& properties, std::vector<Ref<Client>>& clients);
+		PacketManager(Properties& properties, std::deque<Ref<Client>>& clients);
 
 		void ProcessPacket(Ref<Client> client, const Ref<Packet>& packet);
 	};

@@ -30,7 +30,7 @@ namespace Hyperion
 		std::thread m_ContextThread;
 
 		Scope<asio::ip::tcp::acceptor> m_Acceptor;
-		std::vector<Ref<Client>> m_Clients;
+		std::deque<Ref<Client>> m_Clients;
 		size_t m_ConnectionCounter = 0;
 
 		ThreadSafeQueue<OwnedPacket> m_PacketsQueue;
