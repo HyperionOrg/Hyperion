@@ -1,31 +1,31 @@
-#include "HyperionServer.h"
+#include "Hyperion/HyperionServer.h"
 
 #include <iostream>
 #include <fstream>
 
-#include "Utilities/Random.h"
+#include "Hyperion/HyperUtilities/Random.h"
 
 namespace Hyperion
 {
 	HyperionServer::HyperionServer()
+		: m_Properties{ "server.properties" }
 	{
 		Init();
 	}
 
 	HyperionServer::~HyperionServer()
 	{
-		//Shutdown();
+		Shutdown();
 	}
 
 	void HyperionServer::Init()
 	{
 		Log::Init();
 
-		HP_INFO("Starting minecraft server version 1.16.4");
-		Random::Init();
+		HP_INFO("Starting minecraft server version 1.16.5");
+		m_Timer.Start();
 
 		HP_INFO("Loading properties");
-		m_Properties = Properties("server.properties");
 		m_Properties.SetProperty("spawn-protection", 16);
 		m_Properties.SetProperty("gamemode", static_cast<std::string>("creative"));
 		m_Properties.SetProperty("pvp", true);
@@ -38,7 +38,7 @@ namespace Hyperion
 		m_Properties.Load();
 		m_Properties.Store();
 
-		m_PacketManager = CreateScope<PacketManager>(m_Properties, m_Clients, std::bind(&HyperionServer::OnClientDisconnect, this, std::placeholders::_1));
+		m_PacketManager = CreateScope<PacketManager>(m_Properties, m_Clients);
 
 		std::optional<uint16_t> port = m_Properties.GetInt("server-port");
 		m_Acceptor = CreateScope<asio::ip::tcp::acceptor>(m_Context, asio::ip::tcp::endpoint(asio::ip::tcp::v4(), port.has_value() ? port.value() : 25565));
@@ -49,7 +49,6 @@ namespace Hyperion
 		try
 		{
 			WaitForClients();
-
 			m_ContextThread = std::thread([this]() { m_Context.run(); });
 		}
 		catch (const std::exception&)
@@ -79,7 +78,6 @@ namespace Hyperion
 	void HyperionServer::Shutdown()
 	{
 		m_Context.stop();
-
 		if (m_ContextThread.joinable()) m_ContextThread.join();
 
 		HP_INFO("Stopping the server");
@@ -87,23 +85,21 @@ namespace Hyperion
 
 	void HyperionServer::Run()
 	{
-		Start();
-
 		while (m_Running)
 		{
-			for (auto& client : m_Clients)
+			for (std::vector<Ref<Client>>::iterator it = m_Clients.begin(); it != m_Clients.end(); it++)
 			{
+				Ref<Client> client = *it;
 				if (client->ReadNextPackets())
 					continue;
-				OnClientDisconnect(client);
 				client.reset();
-				m_Clients.erase(std::remove(m_Clients.begin(), m_Clients.end(), client), m_Clients.end());
+				m_Clients.erase(it++);
 			}
 
 			while (!m_PacketsQueue.empty())
 			{
 				auto packet = m_PacketsQueue.pop_front();
-				m_PacketManager->ProcessPacket(packet.Remote, packet.Packet);
+				m_PacketManager->ProcessPacket(packet.Remote, packet.ClientPacket);
 			}
 
 			// TODO: Implement async commands
@@ -116,29 +112,17 @@ namespace Hyperion
 			{
 				if (connectionError)
 				{
-					HP_ERROR("Connection Error: {0}", connectionError.message());
-					HP_ASSERT(false, "Connecting failed!");
+					HP_ERROR("Client Connection Error: {0}", connectionError.message());
+					return;
 				}
-				else
-				{
-					Ref<Client> client = CreateRef<Client>();
-					client->Init(m_Context, std::move(socket), m_PacketsQueue);
 
-					OnClientConnect(client);
+				Ref<Client> client = CreateRef<Client>();
+				client->Init(m_Context, std::move(socket), m_PacketsQueue);
 
-					m_Clients.push_back(std::move(client));
-					m_Clients.back()->ConnectClient(m_ConnectionCounter++);
+				m_Clients.push_back(client);
+				m_Clients.back()->ConnectClient(m_ConnectionCounter++);
 
-					WaitForClients();
-				}
+				WaitForClients();
 			});
-	}
-
-	void HyperionServer::OnClientConnect(Ref<Client> client)
-	{
-	}
-
-	void HyperionServer::OnClientDisconnect(Ref<Client> client)
-	{
 	}
 }

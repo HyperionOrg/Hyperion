@@ -1,8 +1,10 @@
 #include "Hyperion/HyperionServer.h"
 
+using namespace Hyperion;
+
 int main()
 {
-	Hyperion::HyperionServer* hyperionServer = new Hyperion::HyperionServer();
+	HyperionServer* hyperionServer = new HyperionServer();
 	hyperionServer->Run();
 	delete hyperionServer;
 	return 0;

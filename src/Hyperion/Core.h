@@ -20,7 +20,7 @@ constexpr Ref<T> CreateRef(Args&& ... args)
 	return std::make_shared<T>(std::forward<Args>(args)...);
 }
 
-#include "Utilities/Log.h"
+#include "Hyperion/HyperUtilities/Log.h"
 
 #ifdef _DEBUG
 	#define HP_ASSERT(x, ...) { if(!(x)) { HP_FATAL("Assertion Failed: {0}", __VA_ARGS__); __debugbreak(); } }

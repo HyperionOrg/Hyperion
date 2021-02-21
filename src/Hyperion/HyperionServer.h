@@ -1,25 +1,19 @@
 #pragma once
 
-#ifdef _WIN32
-#ifndef _WIN32_WINNT
-#define _WIN32_WINNT 0x0601
-#endif
-#endif
-
 #include <asio.hpp>
 
 #include <string>
 #include <thread>
 #include <vector>
 
-#include "Core.h"
-#include "Network/Client.h"
-#include "Network/Connection.h"
-#include "Network/Packet.h"
-#include "Network/PacketManager.h"
-#include "Utilities/Properties.h"
-#include "Utilities/ThreadSafeQueue.h"
-#include "Utilities/Timer.h"
+#include "Hyperion/Core.h"
+#include "Hyperion/HyperNetwork/Client.h"
+#include "Hyperion/HyperNetwork/Connection.h"
+#include "Hyperion/HyperNetwork/Packet.h"
+#include "Hyperion/HyperNetwork/PacketManager.h"
+#include "Hyperion/HyperUtilities/Properties.h"
+#include "Hyperion/HyperUtilities/ThreadSafeQueue.h"
+#include "Hyperion/HyperUtilities/Timer.h"
 
 namespace Hyperion
 {
@@ -27,16 +21,16 @@ namespace Hyperion
 	{
 	private:
 		Properties m_Properties;
+		Timer m_Timer;
+
 		Scope<PacketManager> m_PacketManager;
 		std::thread m_CommandThread;
-
-		Timer m_Timer;
 
 		asio::io_context m_Context;
 		std::thread m_ContextThread;
 
 		Scope<asio::ip::tcp::acceptor> m_Acceptor;
-		std::deque<Ref<Client>> m_Clients;
+		std::vector<Ref<Client>> m_Clients;
 		size_t m_ConnectionCounter = 0;
 
 		ThreadSafeQueue<OwnedPacket> m_PacketsQueue;
@@ -55,8 +49,5 @@ namespace Hyperion
 		void Shutdown();
 
 		void WaitForClients();
-
-		void OnClientConnect(Ref<Client> client);
-		void OnClientDisconnect(Ref<Client> client);
 	};
 }

@@ -43,7 +43,6 @@ add_executable("${HYPERION_NAME}" "${HYPERION_SOURCE}")
 
 target_include_directories("${HYPERION_NAME}" PRIVATE
                             "${CMAKE_SOURCE_DIR}/src/"
-                            "${CMAKE_SOURCE_DIR}/src/Hyperion"
                             "${CMAKE_SOURCE_DIR}/vendor/asio/asio/include"
                             "${CMAKE_SOURCE_DIR}/vendor/json/single_include"
                             "${CMAKE_SOURCE_DIR}/vendor/spdlog/include"
