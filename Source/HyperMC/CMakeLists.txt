@@ -15,6 +15,7 @@ cmake_minimum_required(VERSION 3.10)
 set(SOURCES
         src/main.cpp)
 
-add_executable(HyperMC ${SOURCES})
+add_executable(HyperMC ${SOURCES} ${HEADERS})
+target_compile_features(HyperMC PRIVATE cxx_std_17)
 target_include_directories(HyperMC PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/include)
-target_link_libraries(HyperMC PRIVATE asio ${CMAKE_THREAD_LIBS_INIT})
+target_link_libraries(HyperMC PRIVATE ${CMAKE_THREAD_LIBS_INIT} asio fmt)
