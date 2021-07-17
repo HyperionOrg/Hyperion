@@ -53,3 +53,7 @@ ipch/
 *.ini
 *.cfg
 *.json
+
+# CLion
+/.idea/
+/cmake-build-*/

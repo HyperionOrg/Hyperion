@@ -8,6 +8,3 @@
 # CMake Info
 #-------------------------------------------------------------------------------------------
 cmake_minimum_required(VERSION 3.10)
-project(HyperMC)
-
-add_subdirectory(Source)
