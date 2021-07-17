@@ -4,8 +4,13 @@
  * SPDX-License-Identifier: MIT
  */
 
+#include <Network/Server.hpp>
 #include <cstdint>
 
-int32_t main(int32_t argc, char** argv)
+int32_t main(int32_t, char**)
 {
+	Server server(25565);
+	server.run();
+
+	return 0;
 }

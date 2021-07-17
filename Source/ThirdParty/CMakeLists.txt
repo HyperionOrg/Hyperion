@@ -17,7 +17,7 @@ file(GLOB_RECURSE HEADERS ${CMAKE_CURRENT_SOURCE_DIR}/asio/asio/include/*.hpp)
 
 add_library(asio STATIC ${SOURCES} ${HEADERS})
 set_target_properties(asio PROPERTIES FOLDER ThirdParty)
-target_compile_definitions(asio PRIVATE ASIO_SEPARATE_COMPILATION=1)
+target_compile_definitions(asio PUBLIC ASIO_SEPARATE_COMPILATION=1)
 target_include_directories(asio PUBLIC ${OPENSSL_INCLUDE_DIR} ${CMAKE_CURRENT_SOURCE_DIR}/asio/asio/include)
 target_link_libraries(asio PUBLIC ${OPENSSL_LIBRARIES})
 
