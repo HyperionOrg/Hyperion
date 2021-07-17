@@ -47,7 +47,7 @@ void Server::handle_connection(const std::error_code& error_code, asio::ip::tcp:
 	Logger::info("Connection successfully accepted! ({})", socket->remote_endpoint().address().to_string());
 
 	auto* player = new Player(m_entity_id++, socket);
-	player->start();
+	player->start_reading();
 
 	m_players.push_back(player);
 

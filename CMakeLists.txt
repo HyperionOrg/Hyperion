@@ -50,7 +50,7 @@ endif ()
 
 if ("${BUILD_TYPE}" STREQUAL "Debug")
     if ("${COMPILER}" STREQUAL "Clang")
-        set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -O0 -g")
+        set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -O0 -g -D_GLIBCXX_DEBUG")
     elseif ("${COMPILER}" STREQUAL "GNU")
         set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -O0 -g")
     elseif ("${COMPILER}" STREQUAL "MSVC")

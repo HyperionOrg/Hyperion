@@ -16,13 +16,23 @@ set(SOURCES
         src/main.cpp
         src/Core/Logger.cpp
         src/Core/Player.cpp
-        src/Network/Server.cpp)
+        src/Network/Connection.cpp
+        src/Network/Server.cpp
+        src/Packets/Packet.cpp
+        src/Packets/PacketsIn/PacketInHandshake.cpp
+        src/Utilities/VarInt.cpp
+        src/Utilities/VarLong.cpp)
 
 set(HEADERS
         include/Core/Logger.hpp
         include/Core/Player.hpp
+        include/Network/Connection.hpp
         include/Network/Server.hpp
-        include/Utilities/Prerequisites.hpp)
+        include/Packets/Packet.hpp
+        include/Packets/PacketsIn/PacketInHandshake.hpp
+        include/Utilities/Prerequisites.hpp
+        include/Utilities/VarInt.hpp
+        include/Utilities/VarLong.hpp)
 
 add_executable(HyperMC ${SOURCES} ${HEADERS})
 target_compile_features(HyperMC PRIVATE cxx_std_17)

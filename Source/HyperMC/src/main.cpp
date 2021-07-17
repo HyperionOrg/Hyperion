@@ -9,6 +9,8 @@
 
 int32_t main(int32_t, char**)
 {
+	setbuf(stdout, nullptr);
+	
 	Server server(25565);
 	server.run();
 
